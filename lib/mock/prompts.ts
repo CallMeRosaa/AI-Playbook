@@ -8,6 +8,7 @@ export interface Prompt {
   timeSaved: string;
   description: string;
   prompt: string;
+  sensitive?: true;
 }
 
 export const PROMPTS: Prompt[] = [
@@ -103,6 +104,7 @@ export const PROMPTS: Prompt[] = [
     timeSaved: "3 hrs",
     description: "Draft a mission brief for a distinguished visitor.",
     prompt: `Draft a 5-minute Distinguished Visitor (DV) mission brief outline. Include: unit mission statement, key statistics and accomplishments, current challenges or capability gaps, and one clear ask or message. Assume a non-technical audience. Use the elevator pitch principle — make them care in the first 30 seconds.\n\nUnit: [UNIT NAME]\nMission: [MISSION DESCRIPTION]\nAudience: [VIP TITLE/BACKGROUND]\nKey ask: [WHAT YOU WANT FROM THE VISIT]`,
+    sensitive: true,
   },
   {
     id: "c5",
@@ -170,6 +172,7 @@ export const PROMPTS: Prompt[] = [
     timeSaved: "1 hr",
     description: "Build a structured operational risk assessment.",
     prompt: `Create an Air Force Operational Risk Management (ORM) risk assessment for the following activity. Use the standard 5-step ORM process: identify hazards, assess hazards (severity × probability), develop controls, implement controls, supervise and evaluate. Format as a table with columns for Hazard, Risk Level, Controls, Residual Risk.\n\nActivity: [DESCRIBE THE OPERATION OR TASK]\nEnvironment: [LOCATION, WEATHER, TIME]\nPersonnel involved: [RANKS/EXPERIENCE LEVELS]\nKnown hazards: [LIST ANY YOU'VE ALREADY IDENTIFIED]`,
+    sensitive: true,
   },
   {
     id: "o2",
@@ -179,6 +182,7 @@ export const PROMPTS: Prompt[] = [
     timeSaved: "2 hrs",
     description: "Summarize a concept of operations into a 1-page brief.",
     prompt: `Write a concise Concept of Operations (CONOP) summary for senior leadership. Use this structure: Situation, Mission, Concept of Operations (phases), Tasks to subordinate units, Coordinating instructions, Command and Signal. Keep to one page. Assume the reader knows the theater but not the specific plan.\n\nOperation details: [DESCRIBE THE OPERATION]\nObjective: [END STATE]\nPhases: [LIST PHASES IF KNOWN]\nKey constraints: [TIME, RESOURCES, ROE]`,
+    sensitive: true,
   },
   {
     id: "o3",
@@ -188,6 +192,7 @@ export const PROMPTS: Prompt[] = [
     timeSaved: "3 hrs",
     description: "Draft a unit SOP for a recurring task or process.",
     prompt: `Draft a Standard Operating Procedure (SOP) for the following task. Structure: Purpose, Scope, Responsibilities, Step-by-step procedure (numbered), References, and Record keeping. Write clearly enough that a newly assigned Airman could execute the task independently after reading.\n\nTask: [DESCRIBE THE TASK]\nUnit: [UNIT NAME]\nHow it's currently done: [DESCRIBE CURRENT PROCESS]\nCommon mistakes or risks: [KNOWN PITFALLS]`,
+    sensitive: true,
   },
   {
     id: "o4",
@@ -197,6 +202,7 @@ export const PROMPTS: Prompt[] = [
     timeSaved: "1.5 hrs",
     description: "Structure a 5-paragraph OPORD-style mission brief.",
     prompt: `Outline a mission brief using the 5-paragraph OPORD format (SMEAC): Situation, Mission, Execution, Administration and Logistics, Command and Signal. Keep each section concise and focused on what the team needs to execute. Identify any branches or sequels.\n\nMission: [DESCRIBE THE MISSION]\nEnvironment: [LOCATION/CONDITIONS]\nFriendly forces: [ASSETS AVAILABLE]\nEnemy/threat: [ADVERSARY OR RISK FACTORS IF APPLICABLE]\nTime constraints: [TIMELINE]`,
+    sensitive: true,
   },
 
   // Logistics
@@ -237,6 +243,7 @@ export const PROMPTS: Prompt[] = [
     timeSaved: "1 hr",
     description: "Structure an operations summary from raw reporting.",
     prompt: `Draft an Operations Summary (OPSUM) using the following raw reporting. Use standard intel format: DTG, Classification header, Summary paragraph (BLUF), Key Events (numbered, most significant first), Assessment, and Information Gaps. Keep language precise and unambiguous.\n\nClassification: [UNCLASS/CUI]\nReporting period: [DATES]\nArea of interest: [REGION/UNIT]\nRaw events to summarize:\n[PASTE REPORTING]`,
+    sensitive: true,
   },
   {
     id: "i2",
@@ -246,6 +253,7 @@ export const PROMPTS: Prompt[] = [
     timeSaved: "1.5 hrs",
     description: "Structure a threat environment brief for a deploying unit.",
     prompt: `Outline a threat environment brief for a deploying Air Force unit. Structure: Classification, Overview of the operational environment, Threat actors (capabilities, intent, recent activity), Key terrain and infrastructure risks, Recommended force protection measures, and Intelligence gaps. Format for a 10-minute verbal brief.\n\nDestination: [REGION/COUNTRY — UNCLASS ONLY]\nUnit type deploying: [AFSC/MISSION]\nKnown concerns: [ANY SPECIFIC THREATS OR INCIDENTS]\nClassification level: UNCLASS`,
+    sensitive: true,
   },
 ];
 

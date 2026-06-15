@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Copy, Check, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Copy, Check, Clock, ChevronDown, ChevronUp, ShieldAlert } from "lucide-react";
 import { PROMPTS, CATEGORIES, type PromptCategory } from "@/lib/mock/prompts";
 
 const categoryColors: Record<PromptCategory, string> = {
@@ -114,6 +114,12 @@ export default function PromptsPage() {
                         <Clock size={10} />
                         saves ~{prompt.timeSaved}
                       </span>
+                      {prompt.sensitive && (
+                        <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                          <ShieldAlert size={10} />
+                          Sensitive
+                        </span>
+                      )}
                     </div>
                     <h3 className="text-sm font-bold text-[#002554] leading-tight">{prompt.title}</h3>
                     <p className="text-xs text-gray-500 mt-0.5 leading-snug">{prompt.description}</p>
@@ -132,6 +138,12 @@ export default function PromptsPage() {
                       {prompt.prompt}
                     </p>
                   </div>
+                  {prompt.sensitive && (
+                    <p className="mt-2 flex items-start gap-1.5 text-[10px] font-semibold text-amber-800">
+                      <ShieldAlert size={11} className="flex-shrink-0 mt-px" />
+                      Use a NIPR-approved tool only. Do not enter CUI, classified, or PII.
+                    </p>
+                  )}
                   <button
                     onClick={() => handleCopy(prompt.id, prompt.prompt)}
                     className={`mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
