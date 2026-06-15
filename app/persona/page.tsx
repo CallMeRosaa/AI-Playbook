@@ -1,116 +1,209 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronRight, ChevronLeft, Copy, Check, Download, Sparkles, User } from "lucide-react";
+import { Fragment, useState } from "react";
+import {
+  ChevronRight, ChevronLeft, Copy, Check, Download,
+  Sparkles, ExternalLink, CheckCircle2,
+} from "lucide-react";
+import { getAfscProfile, COMMON_ADDITIONAL_DUTIES } from "@/lib/data/afsc-data";
 
-const RANKS = [
-  "AB", "Amn", "A1C", "SrA", "SSgt", "TSgt", "MSgt", "SMSgt", "CMSgt",
-  "2Lt", "1Lt", "Capt", "Maj", "Lt Col", "Col", "Brig Gen", "Maj Gen", "Lt Gen", "Gen",
-];
+const ENLISTED_RANKS = ["AB", "Amn", "A1C", "SrA", "SSgt", "TSgt", "MSgt", "SMSgt", "CMSgt"];
+const OFFICER_RANKS = ["2Lt", "1Lt", "Capt", "Maj", "Lt Col", "Col", "Brig Gen", "Maj Gen", "Lt Gen", "Gen"];
 
-const DAILY_TOOLS = [
-  "MS Outlook", "MS Teams", "SharePoint", "PowerPoint", "Excel", "Word",
-  "GCSS-AF", "MyFSS", "Air Force Portal", "AROWS", "eMSO", "DTMS",
-];
-
-const AI_GOALS = [
-  "Write faster (EPRs, emails, memos)",
-  "Research and summarize regulations",
-  "Build briefings and slide decks",
-  "Analyze data and create reports",
-  "Create training materials",
-  "Draft SOPs and checklists",
-  "Prepare for boards and interviews",
-  "Manage my schedule and tasks",
+const AI_STYLE_OPTIONS = [
+  { label: "Short bullets — give me the bottom line", value: "Concise bullet points, no filler text" },
+  { label: "BLUF first, then the detail", value: "Military BLUF format — bottom line up front, supporting detail after" },
+  { label: "Step-by-step — walk me through it", value: "Numbered step-by-step instructions" },
+  { label: "Full explanation with context", value: "Complete explanations with background and reasoning" },
 ];
 
 interface FormData {
   rank: string;
-  name: string;
   afsc: string;
-  yearsOfService: string;
-  installation: string;
-  unit: string;
-  billet: string;
-  tasks: [string, string, string];
-  tools: string[];
-  aiGoals: string[];
-  tone: string;
-  outputFormat: string;
+  jobTitle: string;
+  dailyTasks: string;
+  biggestGrind: string;
+  publications: string;
+  additionalDuties: string[];
+  aiStyle: string;
 }
 
-const initialForm: FormData = {
+const initial: FormData = {
   rank: "",
-  name: "",
   afsc: "",
-  yearsOfService: "",
-  installation: "",
-  unit: "",
-  billet: "",
-  tasks: ["", "", ""],
-  tools: [],
-  aiGoals: [],
-  tone: "Professional and direct",
-  outputFormat: "Bullet points where possible",
+  jobTitle: "",
+  dailyTasks: "",
+  biggestGrind: "",
+  publications: "",
+  additionalDuties: [],
+  aiStyle: "",
 };
 
-const steps = [
-  { title: "Identity", subtitle: "Who are you?" },
-  { title: "Assignment", subtitle: "Where are you serving?" },
-  { title: "Daily Work", subtitle: "What do you do?" },
-  { title: "AI Goals", subtitle: "What do you want from AI?" },
-  { title: "Your Style", subtitle: "How should AI talk to you?" },
+const STEPS = [
+  { label: "Identity",    sublabel: "Who are you?" },
+  { label: "Your Day",    sublabel: "What do you do?" },
+  { label: "The Grind",   sublabel: "Where does your time go?" },
+  { label: "Duties & Refs", sublabel: "What else do you manage?" },
+  { label: "Your Style",  sublabel: "How should AI talk to you?" },
 ];
 
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function Stepper({ current }: { current: number }) {
+  return (
+    <div className="px-5 pt-4 pb-3 bg-white border-b border-gray-100">
+      <div className="flex items-center">
+        {STEPS.map((_, i) => (
+          <Fragment key={i}>
+            <div
+              className={`
+                w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0
+                text-xs font-bold transition-all duration-250
+                ${i < current  ? "bg-primary text-white"
+                : i === current ? "bg-warm text-primary-dark"
+                :                 "bg-gray-100 text-gray-400"}
+              `}
+            >
+              {i < current ? <Check size={13} strokeWidth={2.5} /> : i + 1}
+            </div>
+            {i < STEPS.length - 1 && (
+              <div
+                className={`flex-1 h-px mx-1 transition-colors duration-400 ${
+                  i < current ? "bg-primary" : "bg-gray-200"
+                }`}
+              />
+            )}
+          </Fragment>
+        ))}
+      </div>
+      <div className="mt-2.5 flex items-baseline justify-between">
+        <span className="text-xs font-bold text-primary-dark">
+          {STEPS[current].label}
+          <span className="font-normal text-gray-400"> — {STEPS[current].sublabel}</span>
+        </span>
+        <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap ml-2">
+          {current + 1} / {STEPS.length}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function RankSelector({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const Group = ({ label, ranks }: { label: string; ranks: string[] }) => (
+    <div className="mb-3 last:mb-0">
+      <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">{label}</p>
+      <div className="flex flex-wrap gap-1.5">
+        {ranks.map((r) => (
+          <button
+            key={r}
+            type="button"
+            onClick={() => onChange(r)}
+            className={`text-xs font-bold px-3 py-1.5 rounded-badge border transition-all duration-150 ${
+              value === r
+                ? "bg-primary text-white border-primary"
+                : "bg-white text-gray-600 border-gray-200 hover:border-primary/40 hover:text-primary"
+            }`}
+          >
+            {r}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="bg-gray-50 rounded-inner p-3 border border-gray-100">
+      <Group label="Enlisted" ranks={ENLISTED_RANKS} />
+      <Group label="Officer"  ranks={OFFICER_RANKS}  />
+    </div>
+  );
+}
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5 block">
+      {children}
+    </label>
+  );
+}
+
+function Hint({ show, text }: { show: boolean; text: string }) {
+  if (!show) return null;
+  return (
+    <p className="text-[11px] text-caution font-semibold mt-1.5 flex items-center gap-1">
+      <span className="inline-block w-1 h-1 rounded-full bg-caution flex-shrink-0" />
+      {text}
+    </p>
+  );
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
+
 export default function PersonaPage() {
-  const [step, setStep] = useState(0);
-  const [form, setForm] = useState<FormData>(initialForm);
-  const [loading, setLoading] = useState(false);
-  const [persona, setPersona] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [step, setStep]           = useState(0);
+  const [direction, setDirection] = useState<"fwd" | "back">("fwd");
+  const [form, setForm]           = useState<FormData>(initial);
+  const [loading, setLoading]     = useState(false);
+  const [persona, setPersona]     = useState<string | null>(null);
+  const [copied, setCopied]       = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
-  const update = (field: keyof FormData, value: unknown) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
+  const update = (field: keyof FormData, value: string) =>
+    setForm((p) => ({ ...p, [field]: value }));
 
-  const toggleTool = (tool: string) => {
-    setForm((prev) => ({
-      ...prev,
-      tools: prev.tools.includes(tool)
-        ? prev.tools.filter((t) => t !== tool)
-        : [...prev.tools, tool],
+  const toggleDuty = (id: string) =>
+    setForm((p) => ({
+      ...p,
+      additionalDuties: p.additionalDuties.includes(id)
+        ? p.additionalDuties.filter((d) => d !== id)
+        : [...p.additionalDuties, id],
     }));
-  };
 
-  const toggleGoal = (goal: string) => {
-    setForm((prev) => ({
-      ...prev,
-      aiGoals: prev.aiGoals.includes(goal)
-        ? prev.aiGoals.filter((g) => g !== goal)
-        : [...prev.aiGoals, goal],
-    }));
-  };
+  const appendTask = (task: string) =>
+    setForm((p) => {
+      const cur = p.dailyTasks.trim();
+      return { ...p, dailyTasks: cur ? `${cur}\n${task}` : task };
+    });
 
   const canAdvance = () => {
-    if (step === 0) return form.rank && form.name && form.afsc;
-    if (step === 1) return form.installation && form.unit && form.billet;
-    if (step === 2) return form.tasks[0].trim();
-    if (step === 3) return form.aiGoals.length > 0;
-    if (step === 4) return form.tone;
+    if (step === 0) return !!(form.rank && form.afsc.trim() && form.jobTitle.trim());
+    if (step === 1) return form.dailyTasks.trim().length > 20;
+    if (step === 2) return form.biggestGrind.trim().length > 10;
+    if (step === 3) return true;
+    if (step === 4) return !!form.aiStyle;
     return true;
   };
 
+  const goNext = () => {
+    if (!canAdvance()) { setAttempted(true); return; }
+    setAttempted(false);
+    setDirection("fwd");
+    setStep((s) => s + 1);
+  };
+
+  const goBack = () => {
+    setAttempted(false);
+    setDirection("back");
+    setStep((s) => s - 1);
+  };
+
   const handleGenerate = async () => {
+    if (!canAdvance()) { setAttempted(true); return; }
     setLoading(true);
     try {
+      const dutyLabels = form.additionalDuties.map(
+        (id) => COMMON_ADDITIONAL_DUTIES.find((d) => d.id === id)?.label ?? id
+      );
       const res = await fetch("/api/persona", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, additionalDutyLabels: dutyLabels }),
       });
       const data = await res.json();
       setPersona(data.persona);
     } catch {
-      setPersona("Error generating persona. Please try again.");
+      setPersona("Error generating context file. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -126,10 +219,10 @@ export default function PersonaPage() {
   const handleDownload = () => {
     if (!persona) return;
     const blob = new Blob([persona], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${form.name.replace(/\s+/g, "_")}_AI_Context_File.txt`;
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `${form.rank}_${form.afsc}_AI_Context.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -137,68 +230,87 @@ export default function PersonaPage() {
   const handleReset = () => {
     setPersona(null);
     setStep(0);
-    setForm(initialForm);
+    setForm(initial);
+    setAttempted(false);
   };
 
-  // Result screen
+  const openEpubs = () => {
+    const q   = form.publications.trim();
+    const url = q
+      ? `https://www.e-publishing.af.mil/product-index/#/?view=search&keyword=${encodeURIComponent(q)}`
+      : "https://www.e-publishing.af.mil";
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const afscProfile = getAfscProfile(form.afsc);
+
+  // ── Completion screen ──
   if (persona) {
     return (
       <div className="flex flex-col">
-        <div className="bg-[#FFC72C] px-5 pt-8 pb-5">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles size={18} className="text-[#003087]" />
-            <span className="text-xs font-bold uppercase tracking-wider text-[#003087]">
-              Your AI Context File
-            </span>
+        <div className="bg-warm px-5 pt-8 pb-5">
+          <div className="flex items-center gap-3 mb-3">
+            <CheckCircle2 size={30} className="text-primary animate-check-pop flex-shrink-0" />
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
+                Context File Ready
+              </span>
+              <h1
+                className="text-xl font-black uppercase tracking-tight text-primary leading-tight"
+                style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
+              >
+                {form.rank} · {form.afsc}
+              </h1>
+            </div>
           </div>
-          <h1
-            className="text-2xl font-black uppercase tracking-tight text-[#003087] leading-tight"
-            style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-          >
-            {form.rank} {form.name}
-          </h1>
-          <p className="text-sm text-[#002554]/80 mt-1">
-            Paste this into any AI tool before your first message for dramatically better results.
+          <p className="text-sm text-primary-dark/80">
+            Paste this into any AI tool before your first message.
           </p>
         </div>
 
-        <div className="h-1 bg-[#003087]" />
+        <div className="h-1 bg-primary" />
 
-        <div className="px-4 pt-4 flex flex-col gap-3">
-          {/* The generated file */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-            <pre className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">{persona}</pre>
+        <div className="px-4 pt-4 flex flex-col gap-3 pb-6">
+          <div className="bg-white rounded-card shadow-resting border border-gray-100 p-4">
+            <pre className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">
+              {persona}
+            </pre>
           </div>
 
-          {/* Actions */}
           <button
             onClick={handleCopy}
-            className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
-              copied ? "bg-green-500 text-white" : "bg-[#003087] text-white"
+            className={`w-full flex items-center justify-center gap-2 py-3 rounded-inner text-sm font-bold transition-all duration-250 ${
+              copied
+                ? "bg-success text-white"
+                : "bg-primary text-white active:bg-primary-dark"
             }`}
           >
-            {copied ? <><Check size={16} /> Copied!</> : <><Copy size={16} /> Copy to Clipboard</>}
+            {copied
+              ? <><Check size={16} /> Copied to clipboard</>
+              : <><Copy size={16} /> Copy to Clipboard</>
+            }
           </button>
+
           <button
             onClick={handleDownload}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold bg-white border border-gray-200 text-[#003087]"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-inner text-sm font-bold bg-white border border-gray-200 text-primary active:bg-gray-50 transition-colors"
           >
             <Download size={16} /> Download as .txt
           </button>
+
           <button
             onClick={handleReset}
-            className="text-xs text-gray-400 font-medium text-center py-2"
+            className="text-xs text-gray-400 font-medium text-center py-2 hover:text-gray-600 transition-colors"
           >
             Start over
           </button>
 
-          {/* Usage tip */}
-          <div className="p-4 rounded-2xl bg-[#003087]/5 border border-[#003087]/10">
-            <p className="text-xs text-[#002554] font-semibold mb-1">💡 How to use this file</p>
+          <div className="p-4 rounded-card bg-primary/5 border border-primary/10">
+            <p className="text-xs text-primary-dark font-semibold mb-1">How to use this</p>
             <p className="text-xs text-gray-600 leading-relaxed">
-              Copy and paste this entire file into the system prompt or first message of any AI tool —
-              GenAI.mil, NIPRGPT, Claude, or ChatGPT. The AI will immediately understand your role
-              and tailor every response to your needs.
+              Paste this entire file into the first message of any AI session —
+              GenAI.mil, NIPRGPT, Claude, or ChatGPT. The AI will immediately
+              know your role and how to help you.
             </p>
           </div>
         </div>
@@ -206,284 +318,254 @@ export default function PersonaPage() {
     );
   }
 
+  // ── Wizard ──
+  const animClass = direction === "fwd" ? "step-enter-fwd" : "step-enter-back";
+
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="bg-[#FFC72C] px-5 pt-8 pb-5">
-        <div className="flex items-center gap-2 mb-2">
-          <User size={18} className="text-[#003087]" />
-          <span className="text-xs font-bold uppercase tracking-wider text-[#003087]">Persona Builder</span>
-        </div>
+      <div className="bg-warm px-5 pt-8 pb-5">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+          Persona Builder
+        </span>
         <h1
-          className="text-2xl font-black uppercase tracking-tight text-[#003087] leading-tight"
+          className="text-2xl font-black uppercase tracking-tight text-primary leading-tight mt-1"
           style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
         >
-          Build Your<br />AI Context File
+          {STEPS[step].label}
         </h1>
-        <p className="text-sm text-[#002554]/80 mt-1">
-          5 quick steps. Better AI outputs every time.
-        </p>
+        <p className="text-sm text-primary-dark/70 mt-0.5">{STEPS[step].sublabel}</p>
       </div>
 
-      {/* Progress */}
-      <div className="bg-[#003087] px-4 py-3">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-xs font-bold text-white">
-            Step {step + 1} of {steps.length}: {steps[step].title}
-          </span>
-          <span className="text-xs text-blue-300">{steps[step].subtitle}</span>
-        </div>
-        <div className="flex gap-1">
-          {steps.map((_, i) => (
-            <div
-              key={i}
-              className={`h-1 flex-1 rounded-full transition-colors ${
-                i <= step ? "bg-[#FFC72C]" : "bg-white/20"
-              }`}
-            />
-          ))}
-        </div>
-      </div>
+      {/* Stepper */}
+      <Stepper current={step} />
 
-      {/* Form steps */}
-      <div className="px-4 pt-5 flex flex-col gap-4">
-        {/* Step 0: Identity */}
+      {/* Step content — key forces remount on each step change, triggering slide animation */}
+      <div key={step} className={`px-4 pt-6 flex flex-col gap-5 pb-6 ${animClass}`}>
+
+        {/* ── Step 0: Identity ── */}
         {step === 0 && (
           <>
-            <div>
-              <label className="block text-xs font-bold text-[#002554] mb-1.5 uppercase tracking-wider">Rank *</label>
-              <select
-                value={form.rank}
-                onChange={(e) => update("rank", e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#003087]/30"
-              >
-                <option value="">Select rank...</option>
-                {RANKS.map((r) => <option key={r} value={r}>{r}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-[#002554] mb-1.5 uppercase tracking-wider">Name *</label>
-              <input
-                type="text"
-                placeholder="First Last"
-                value={form.name}
-                onChange={(e) => update("name", e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003087]/30"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-[#002554] mb-1.5 uppercase tracking-wider">AFSC *</label>
-              <input
-                type="text"
-                placeholder="e.g. 3D1X1"
-                value={form.afsc}
-                onChange={(e) => update("afsc", e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003087]/30"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-[#002554] mb-1.5 uppercase tracking-wider">Years of Service</label>
-              <input
-                type="number"
-                placeholder="e.g. 6"
-                min="0"
-                max="40"
-                value={form.yearsOfService}
-                onChange={(e) => update("yearsOfService", e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003087]/30"
-              />
-            </div>
-          </>
-        )}
+            <p className="text-base font-semibold text-primary-dark leading-snug">
+              What&apos;s your rank, AFSC, and what do people call your job?
+            </p>
 
-        {/* Step 1: Assignment */}
-        {step === 1 && (
-          <>
-            <div>
-              <label className="block text-xs font-bold text-[#002554] mb-1.5 uppercase tracking-wider">Installation *</label>
-              <input
-                type="text"
-                placeholder="e.g. Joint Base San Antonio"
-                value={form.installation}
-                onChange={(e) => update("installation", e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003087]/30"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-[#002554] mb-1.5 uppercase tracking-wider">Unit / Organization *</label>
-              <input
-                type="text"
-                placeholder="e.g. 90th Cyberspace Operations Squadron"
-                value={form.unit}
-                onChange={(e) => update("unit", e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003087]/30"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-[#002554] mb-1.5 uppercase tracking-wider">Current Billet / Role *</label>
-              <input
-                type="text"
-                placeholder="e.g. Cyber Systems Operations Technician"
-                value={form.billet}
-                onChange={(e) => update("billet", e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003087]/30"
-              />
-            </div>
-          </>
-        )}
+            <div className="flex flex-col gap-4">
+              <div>
+                <FieldLabel>Rank</FieldLabel>
+                <RankSelector value={form.rank} onChange={(v) => update("rank", v)} />
+                <Hint show={attempted && !form.rank} text="Select your rank to continue" />
+              </div>
 
-        {/* Step 2: Daily Work */}
-        {step === 2 && (
-          <>
-            <div>
-              <label className="block text-xs font-bold text-[#002554] mb-1.5 uppercase tracking-wider">
-                Top 3 Recurring Tasks *
-              </label>
-              {([0, 1, 2] as const).map((i) => (
+              <div>
+                <FieldLabel>AFSC</FieldLabel>
                 <input
-                  key={i}
                   type="text"
-                  placeholder={
-                    i === 0 ? "e.g. Write and process trouble tickets"
-                    : i === 1 ? "e.g. Maintain and patch servers"
-                    : "e.g. Brief leadership on network status (optional)"
-                  }
-                  value={form.tasks[i]}
-                  onChange={(e) => {
-                    const updated: [string, string, string] = [...form.tasks];
-                    updated[i] = e.target.value;
-                    update("tasks", updated);
-                  }}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-[#003087]/30"
+                  placeholder="e.g. 3D1X1"
+                  value={form.afsc}
+                  onChange={(e) => update("afsc", e.target.value)}
+                  className="w-full border border-gray-200 rounded-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                 />
-              ))}
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-[#002554] mb-2 uppercase tracking-wider">
-                Daily Tools You Use
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {DAILY_TOOLS.map((tool) => (
-                  <button
-                    key={tool}
-                    type="button"
-                    onClick={() => toggleTool(tool)}
-                    className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
-                      form.tools.includes(tool)
-                        ? "bg-[#003087] text-white border-[#003087]"
-                        : "bg-white text-gray-600 border-gray-200"
-                    }`}
-                  >
-                    {tool}
-                  </button>
-                ))}
+                <Hint show={attempted && !form.afsc.trim()} text="Enter your AFSC (e.g., 3D1X1)" />
+              </div>
+
+              <div>
+                <FieldLabel>Job Title / What You Actually Do</FieldLabel>
+                <input
+                  type="text"
+                  placeholder="e.g. Network Admin, Crew Chief, Training NCO"
+                  value={form.jobTitle}
+                  onChange={(e) => update("jobTitle", e.target.value)}
+                  className="w-full border border-gray-200 rounded-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                />
+                <Hint show={attempted && !form.jobTitle.trim()} text="Enter your job title" />
               </div>
             </div>
           </>
         )}
 
-        {/* Step 3: AI Goals */}
+        {/* ── Step 1: Daily Tasks ── */}
+        {step === 1 && (
+          <>
+            <p className="text-base font-semibold text-primary-dark leading-snug">
+              Walk me through your average duty day. What are the first things you actually{" "}
+              <em>do</em> when you sit down?
+            </p>
+            <p className="text-xs text-gray-400 -mt-2">
+              Don&apos;t overthink it — just describe what you do, in order.
+            </p>
+            <textarea
+              rows={7}
+              placeholder="e.g. Check AROWS for leave requests, pull the maintenance schedule, triage about 30 emails before 0900, then brief the flight chief on overnight issues..."
+              value={form.dailyTasks}
+              onChange={(e) => update("dailyTasks", e.target.value)}
+              className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none leading-relaxed transition-colors"
+            />
+            <Hint
+              show={attempted && form.dailyTasks.trim().length <= 20}
+              text="Add a bit more detail — describe what you actually do day to day"
+            />
+
+            {afscProfile && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+                  Common tasks for {afscProfile.label} — tap to add
+                </p>
+                <div className="flex flex-col gap-2">
+                  {afscProfile.tasks.map((task) => {
+                    const isAdded = form.dailyTasks.includes(task);
+                    return (
+                      <button
+                        key={task}
+                        type="button"
+                        onClick={() => !isAdded && appendTask(task)}
+                        disabled={isAdded}
+                        className={`flex items-center gap-2 text-left text-xs px-3 py-2.5 rounded-inner border transition-colors ${
+                          isAdded
+                            ? "bg-green-50 border-green-200 text-green-600 cursor-default"
+                            : "bg-white border-gray-200 text-gray-600 active:bg-primary/5"
+                        }`}
+                      >
+                        <CheckCircle2
+                          size={14}
+                          className={isAdded ? "text-green-500 flex-shrink-0" : "text-gray-300 flex-shrink-0"}
+                        />
+                        {task}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ── Step 2: Biggest Grind ── */}
+        {step === 2 && (
+          <>
+            <p className="text-base font-semibold text-primary-dark leading-snug">
+              What recurring task takes up the most of your time — or feels like the biggest grind?
+            </p>
+            <p className="text-xs text-gray-400 -mt-2">
+              This is what we&apos;re going to help you do faster.
+            </p>
+            <textarea
+              rows={7}
+              placeholder="e.g. Writing EPR bullets at the end of every quarter takes me 3-4 hours per person, and I always stare at a blank page for the first hour..."
+              value={form.biggestGrind}
+              onChange={(e) => update("biggestGrind", e.target.value)}
+              className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none leading-relaxed transition-colors"
+            />
+            <Hint
+              show={attempted && form.biggestGrind.trim().length <= 10}
+              text="Tell us a bit more — what specific task eats your time?"
+            />
+          </>
+        )}
+
+        {/* ── Step 3: Duties & References ── */}
         {step === 3 && (
-          <div>
-            <label className="block text-xs font-bold text-[#002554] mb-1 uppercase tracking-wider">
-              What do you want AI to help with? *
-            </label>
-            <p className="text-xs text-gray-500 mb-3">Select all that apply.</p>
+          <>
+            <p className="text-base font-semibold text-primary-dark leading-snug">
+              What AFIs or TOs do you work from — and what additional programs do you manage?
+            </p>
+
+            <div>
+              <FieldLabel>Key Publications (optional)</FieldLabel>
+              <textarea
+                rows={3}
+                placeholder="e.g. AFI 36-2406, T.O. 00-20-1, AFMAN 33-363..."
+                value={form.publications}
+                onChange={(e) => update("publications", e.target.value)}
+                className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none leading-relaxed transition-colors"
+              />
+              <button
+                onClick={openEpubs}
+                className="mt-2 flex items-center justify-center gap-2 w-full py-2.5 rounded-inner border border-primary text-primary text-xs font-bold bg-white active:bg-primary/5 transition-colors"
+              >
+                <ExternalLink size={13} />
+                Search AF e-Publishing (EPUBS)
+              </button>
+            </div>
+
+            <div>
+              <FieldLabel>Additional Programs You Manage</FieldLabel>
+              <p className="text-[10px] text-gray-400 mb-3 -mt-1">
+                These get included in your AI context file so the AI knows your full workload.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {COMMON_ADDITIONAL_DUTIES.map((duty) => {
+                  const selected = form.additionalDuties.includes(duty.id);
+                  return (
+                    <button
+                      key={duty.id}
+                      type="button"
+                      onClick={() => toggleDuty(duty.id)}
+                      title={duty.description}
+                      className={`text-xs font-semibold px-3 py-1.5 rounded-badge border transition-colors ${
+                        selected
+                          ? "bg-primary text-white border-primary"
+                          : "bg-white text-gray-600 border-gray-200"
+                      }`}
+                    >
+                      {selected && <span className="mr-1">✓</span>}
+                      {duty.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {form.additionalDuties.length > 0 && (
+                <p className="text-[10px] text-primary font-medium mt-2">
+                  {form.additionalDuties.length} program{form.additionalDuties.length !== 1 ? "s" : ""} selected
+                </p>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* ── Step 4: AI Style ── */}
+        {step === 4 && (
+          <>
+            <p className="text-base font-semibold text-primary-dark leading-snug">
+              When AI gives you a perfect answer, what does it look like?
+            </p>
             <div className="flex flex-col gap-2">
-              {AI_GOALS.map((goal) => (
+              {AI_STYLE_OPTIONS.map((opt) => (
                 <button
-                  key={goal}
-                  type="button"
-                  onClick={() => toggleGoal(goal)}
-                  className={`text-left text-sm font-medium px-4 py-3 rounded-xl border transition-colors ${
-                    form.aiGoals.includes(goal)
-                      ? "bg-[#003087] text-white border-[#003087]"
-                      : "bg-white text-gray-700 border-gray-200"
+                  key={opt.value}
+                  onClick={() => update("aiStyle", opt.value)}
+                  className={`text-left text-sm font-medium px-4 py-3.5 rounded-inner border transition-all duration-150 ${
+                    form.aiStyle === opt.value
+                      ? "bg-primary text-white border-primary"
+                      : "bg-white text-gray-700 border-gray-200 hover:border-primary/30"
                   }`}
                 >
-                  {goal}
+                  {opt.label}
                 </button>
               ))}
             </div>
-          </div>
-        )}
-
-        {/* Step 4: Style */}
-        {step === 4 && (
-          <>
-            <div>
-              <label className="block text-xs font-bold text-[#002554] mb-2 uppercase tracking-wider">
-                Preferred Tone *
-              </label>
-              <div className="flex flex-col gap-2">
-                {[
-                  "Professional and direct",
-                  "Formal military (BLUF, headers, etc.)",
-                  "Plain language (simple, conversational)",
-                  "Technical and precise",
-                ].map((tone) => (
-                  <button
-                    key={tone}
-                    type="button"
-                    onClick={() => update("tone", tone)}
-                    className={`text-left text-sm font-medium px-4 py-3 rounded-xl border transition-colors ${
-                      form.tone === tone
-                        ? "bg-[#FFC72C] text-[#002554] border-[#FFC72C]"
-                        : "bg-white text-gray-700 border-gray-200"
-                    }`}
-                  >
-                    {tone}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-[#002554] mb-2 uppercase tracking-wider">
-                Output Format
-              </label>
-              <div className="flex flex-col gap-2">
-                {[
-                  "Bullet points where possible",
-                  "Short paragraphs",
-                  "Tables and structured lists",
-                  "Mix it up based on context",
-                ].map((fmt) => (
-                  <button
-                    key={fmt}
-                    type="button"
-                    onClick={() => update("outputFormat", fmt)}
-                    className={`text-left text-sm font-medium px-4 py-3 rounded-xl border transition-colors ${
-                      form.outputFormat === fmt
-                        ? "bg-[#FFC72C] text-[#002554] border-[#FFC72C]"
-                        : "bg-white text-gray-700 border-gray-200"
-                    }`}
-                  >
-                    {fmt}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <Hint show={attempted && !form.aiStyle} text="Select your preferred response style" />
           </>
         )}
 
-        {/* Navigation */}
-        <div className="flex gap-3 pt-2 pb-2">
+        {/* ── Navigation ── */}
+        <div className="flex gap-3 pt-1">
           {step > 0 && (
             <button
-              onClick={() => setStep((s) => s - 1)}
-              className="flex items-center gap-1 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-600"
+              onClick={goBack}
+              className="flex items-center gap-1 px-4 py-3 rounded-inner border border-gray-200 bg-white text-sm font-semibold text-gray-600 active:bg-gray-50 transition-colors"
             >
               <ChevronLeft size={16} /> Back
             </button>
           )}
-          {step < steps.length - 1 ? (
+
+          {step < STEPS.length - 1 ? (
             <button
-              onClick={() => setStep((s) => s + 1)}
-              disabled={!canAdvance()}
-              className={`flex-1 flex items-center justify-center gap-1 py-3 rounded-xl text-sm font-bold transition-all ${
+              onClick={goNext}
+              className={`flex-1 flex items-center justify-center gap-1 py-3 rounded-inner text-sm font-bold transition-all duration-150 ${
                 canAdvance()
-                  ? "bg-[#003087] text-white"
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  ? "bg-primary text-white active:bg-primary-dark"
+                  : "bg-gray-100 text-gray-400"
               }`}
             >
               Next <ChevronRight size={16} />
@@ -491,11 +573,13 @@ export default function PersonaPage() {
           ) : (
             <button
               onClick={handleGenerate}
-              disabled={loading || !canAdvance()}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
-                loading || !canAdvance()
+              disabled={loading}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-inner text-sm font-bold transition-all ${
+                loading
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-[#FFC72C] text-[#003087]"
+                  : canAdvance()
+                  ? "bg-warm text-primary-dark active:bg-warm-dark"
+                  : "bg-gray-100 text-gray-400"
               }`}
             >
               {loading ? (

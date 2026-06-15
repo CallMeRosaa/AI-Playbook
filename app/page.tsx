@@ -1,8 +1,61 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { BookOpen, Wrench, User, Clock, Zap, Shield } from "lucide-react";
+import { BookOpen, Wrench, User, Clock, Zap, Shield, ChevronRight } from "lucide-react";
 import { PROMPTS } from "@/lib/mock/prompts";
 import { TOOLS } from "@/lib/mock/tools";
+import ScrollReveal from "@/components/ScrollReveal";
 
+// ─── Count-up hook ────────────────────────────────────────────────────────────
+function useCountUp(target: number, duration = 900) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (target === 0) return;
+    let raf: number;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+      setCount(Math.round(eased * target));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+
+  return count;
+}
+
+// ─── Stat display ─────────────────────────────────────────────────────────────
+const NIPR_COUNT = TOOLS.filter((t) => t.accessLevel !== "Commercial").length;
+
+function StatBar() {
+  const hrsCount     = useCountUp(6, 800);
+  const promptsCount = useCountUp(PROMPTS.length, 900);
+  const toolsCount   = useCountUp(NIPR_COUNT, 700);
+
+  const statItems = [
+    { icon: Clock,  label: "Est. hrs saved/week",  value: hrsCount >= 6 ? "4–6 hrs" : `${hrsCount} hrs` },
+    { icon: Zap,    label: "Prompts ready to use",  value: `${promptsCount}` },
+    { icon: Shield, label: "NIPR-approved tools",   value: `${toolsCount}` },
+  ];
+
+  return (
+    <div className="bg-primary-dark text-white px-4 py-3 flex justify-around">
+      {statItems.map(({ icon: Icon, label, value }) => (
+        <div key={label} className="flex flex-col items-center text-center">
+          <Icon size={13} className="text-warm mb-0.5" />
+          <span className="text-base font-bold leading-tight tabular-nums">{value}</span>
+          <span className="text-[9px] text-blue-300 leading-tight max-w-[72px] mt-0.5">{label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Feature cards ────────────────────────────────────────────────────────────
 const features = [
   {
     href: "/prompts",
@@ -10,18 +63,20 @@ const features = [
     title: "Prompt Library",
     description: "Ready-to-use AI prompts for EPRs, emails, briefs, and more — tailored for Airmen.",
     stat: `${PROMPTS.length} prompts`,
-    color: "bg-[#003087]",
-    accent: "text-[#FFC72C]",
+    cta: "Browse prompts",
+    color: "bg-primary",
+    accent: "text-warm",
     light: false,
   },
   {
     href: "/tools",
     icon: Wrench,
     title: "AI Tool Catalog",
-    description: "Every AI tool approved for AF use — what it does, where to access, and when to use it.",
+    description: "Know what's approved for official NIPR use and what's personal-only before you start.",
     stat: `${TOOLS.length} tools`,
-    color: "bg-[#002554]",
-    accent: "text-[#FFC72C]",
+    cta: "View catalog",
+    color: "bg-primary-dark",
+    accent: "text-warm",
     light: false,
   },
   {
@@ -30,88 +85,105 @@ const features = [
     title: "Airman Persona Builder",
     description: "Build your personal AI context file. Paste it into any AI tool and instantly get better outputs.",
     stat: "2 min setup",
-    color: "bg-[#FFC72C]",
-    accent: "text-[#003087]",
+    cta: "Build mine",
+    color: "bg-warm",
+    accent: "text-primary",
     light: true,
   },
 ];
 
-const stats = [
-  { icon: Clock, label: "Avg. hrs saved/week", value: "4–6 hrs" },
-  { icon: Zap, label: "Prompts ready to use", value: `${PROMPTS.length}` },
-  { icon: Shield, label: "NIPR-approved tools", value: `${TOOLS.filter(t => t.accessLevel !== "Commercial").length}` },
-];
-
+// ─── Page ─────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   return (
     <div className="flex flex-col">
-      {/* Header */}
-      <div className="bg-[#003087] text-white px-5 pt-10 pb-8">
-        <div className="flex items-center gap-2 mb-2">
-          <Shield size={14} className="text-[#FFC72C]" />
-          <span className="text-[10px] font-bold tracking-widest uppercase text-[#FFC72C]">
-            PFTU 26-3 · AI Workforce Efficiencies
-          </span>
+      {/* ── Hero ── */}
+      <div className="relative bg-primary text-white px-5 pt-10 pb-8 overflow-hidden">
+        {/* Ambient blobs — decorative, pointer-events disabled */}
+        <div aria-hidden="true" className="pointer-events-none select-none">
+          <div className="hero-blob-1 absolute -top-20 -right-20 w-72 h-72 rounded-full" />
+          <div className="hero-blob-2 absolute top-8 -left-24 w-56 h-56 rounded-full" />
         </div>
-        <h1
-          className="text-3xl font-black uppercase tracking-tight leading-tight mb-2"
-          style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-        >
-          Airman&apos;s<br />AI Playbook
-        </h1>
-        <p className="text-sm text-blue-200 font-medium">
-          Reclaim your time. Expand your mission capacity.
-        </p>
-      </div>
 
-      {/* Stats bar */}
-      <div className="bg-[#002554] text-white px-4 py-3 flex justify-around">
-        {stats.map(({ icon: Icon, label, value }) => (
-          <div key={label} className="flex flex-col items-center text-center">
-            <Icon size={13} className="text-[#FFC72C] mb-0.5" />
-            <span className="text-base font-bold leading-tight">{value}</span>
-            <span className="text-[9px] text-blue-300 leading-tight max-w-[72px] mt-0.5">{label}</span>
+        {/* Content — sits above blobs */}
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-3">
+            <Shield size={13} className="text-warm flex-shrink-0" />
+            <span className="text-[11px] font-bold tracking-widest uppercase text-warm">
+              PFTU 26-3 · AI Workforce Efficiencies
+            </span>
           </div>
-        ))}
-      </div>
-
-      {/* Feature cards */}
-      <div className="px-4 pt-5 flex flex-col gap-3">
-        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider px-1">
-          Choose where to start
-        </p>
-
-        {features.map(({ href, icon: Icon, title, description, stat, color, accent, light }) => (
-          <Link key={href} href={href}>
-            <div className={`${color} rounded-2xl p-5 shadow-sm active:scale-[0.98] transition-transform`}>
-              <div className="flex items-start justify-between mb-3">
-                <div className="p-2 rounded-xl bg-white/15">
-                  <Icon size={20} className={accent} />
-                </div>
-                <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/20 ${accent}`}>
-                  {stat}
-                </span>
-              </div>
-              <h2
-                className={`text-lg font-black uppercase tracking-tight ${light ? "text-[#003087]" : "text-white"}`}
-                style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-              >
-                {title}
-              </h2>
-              <p className={`text-sm mt-1 leading-snug ${light ? "text-[#002554]/80" : "text-blue-100"}`}>
-                {description}
-              </p>
-            </div>
-          </Link>
-        ))}
-
-        {/* Mission statement */}
-        <div className="mt-1 p-4 rounded-2xl bg-white border border-gray-100 shadow-sm">
-          <p className="text-[11px] text-gray-500 leading-relaxed text-center">
-            <span className="font-bold text-[#003087]">This is not about manpower reduction.</span>{" "}
-            It&apos;s about returning capacity to the mission — so you can focus on what matters most.
+          <h1
+            className="text-3xl font-black uppercase tracking-tight leading-tight mb-2"
+            style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
+          >
+            Airman&apos;s<br />AI Playbook
+          </h1>
+          <p className="text-sm text-blue-200 font-medium">
+            Reclaim your time. Expand your mission capacity.
           </p>
         </div>
+      </div>
+
+      {/* ── Stats bar (client-side count-up) ── */}
+      <StatBar />
+
+      {/* ── Feature cards ── */}
+      <div className="px-4 pt-5 flex flex-col gap-3">
+        <ScrollReveal>
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider px-1">
+            Choose where to start
+          </p>
+        </ScrollReveal>
+
+        {features.map(({ href, icon: Icon, title, description, stat, cta, color, accent, light }) => (
+          <ScrollReveal key={href}>
+            <Link href={href}>
+              <div className={`
+                ${color} rounded-card p-5 shadow-resting
+                hover:shadow-raised hover:-translate-y-0.5
+                active:scale-[0.98] active:shadow-resting
+                transition-all duration-base ease-smooth
+              `}>
+                {/* Icon + stat count */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="p-2.5 rounded-inner bg-white/20">
+                    <Icon size={20} className={accent} />
+                  </div>
+                  <span className={`text-[11px] font-bold px-2.5 py-1 rounded-badge bg-white/20 ${accent}`}>
+                    {stat}
+                  </span>
+                </div>
+
+                {/* Title + description */}
+                <h2
+                  className={`text-lg font-black uppercase tracking-tight ${light ? "text-primary" : "text-white"}`}
+                  style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
+                >
+                  {title}
+                </h2>
+                <p className={`text-sm mt-1 leading-snug ${light ? "text-primary-dark/80" : "text-blue-100"}`}>
+                  {description}
+                </p>
+
+                {/* CTA row */}
+                <div className={`flex items-center mt-3.5 pt-3 border-t ${light ? "border-primary/15" : "border-white/15"}`}>
+                  <span className={`text-xs font-bold ${light ? "text-primary" : "text-white/90"}`}>{cta}</span>
+                  <ChevronRight size={14} className={`ml-auto ${light ? "text-primary" : "text-white/70"}`} />
+                </div>
+              </div>
+            </Link>
+          </ScrollReveal>
+        ))}
+
+        {/* ── Mission statement ── */}
+        <ScrollReveal>
+          <div className="mt-1 mb-2 p-4 rounded-card bg-white border border-gray-100 shadow-resting">
+            <p className="text-xs text-gray-500 leading-relaxed text-center">
+              <span className="font-bold text-primary">This is not about manpower reduction.</span>{" "}
+              It&apos;s about returning capacity to the mission — so Airmen can focus on what matters most.
+            </p>
+          </div>
+        </ScrollReveal>
       </div>
     </div>
   );

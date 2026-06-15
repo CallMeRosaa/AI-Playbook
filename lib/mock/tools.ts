@@ -139,6 +139,18 @@ export const TOOLS: Tool[] = [
     icon: "✏️",
   },
   {
+    id: "t13",
+    name: "AF e-Publishing (EPUBS)",
+    tagline: "Official AF Publication Library",
+    description:
+      "The authoritative source for all Air Force Instructions (AFIs), Air Force Manuals (AFMANs), Technical Orders (TOs), and pamphlets. Search by publication number or keyword. Always verify you're on the current certified version before citing in official documents.",
+    accessLevel: "Both",
+    useCases: ["Research"],
+    url: "https://www.e-publishing.af.mil",
+    badge: "Official AF",
+    icon: "📋",
+  },
+  {
     id: "t12",
     name: "Runway ML",
     tagline: "AI Video Generation & Editing",
