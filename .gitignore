@@ -1,29 +1,42 @@
-# ──────────────────────────────────────────────────────────────
-# OS / editor noise
-# ──────────────────────────────────────────────────────────────
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
 .DS_Store
-Thumbs.db
-*.tmp
-~$*
-.obsidian/
+*.pem
 
-# ──────────────────────────────────────────────────────────────
-# Build outputs (generated artifacts; source stays tracked)
-# ──────────────────────────────────────────────────────────────
-/build/output/
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# ══════════════════════════════════════════════════════════════
-# PRIVATE / LOCAL-ONLY  —  NEVER PUBLISH TO GIT
-# ──────────────────────────────────────────────────────────────
-# These trees hold the supporting context & guardrails: tasker
-# summaries and anything naming PFTU 26-3 / TASKORD / the authority
-# chain / personnel. They exist ONLY on the local working machine to
-# give the model context. Only what we PRODUCE (handbook/, deliverables/,
-# build/ outputs) and a sanitized README are ever pushed.
-#
-# If you add a new sensitive file, put it under one of these paths.
-# ══════════════════════════════════════════════════════════════
-/CLAUDE.md
-/context/
-/decisions/
-/resources/
+# env files (can opt-in for committing if needed)
+.env*
+!.env.local.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
