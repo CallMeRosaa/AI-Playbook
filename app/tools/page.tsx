@@ -5,9 +5,16 @@ import { ExternalLink, Shield, Wifi, Globe } from "lucide-react";
 import { TOOLS, USE_CASES, type AccessLevel, type UseCase } from "@/lib/mock/tools";
 
 const accessBadge: Record<AccessLevel, { label: string; color: string; icon: typeof Shield }> = {
-  NIPR: { label: "NIPR Approved", color: "bg-green-100 text-green-700", icon: Shield },
-  Commercial: { label: "Commercial", color: "bg-yellow-100 text-yellow-700", icon: Globe },
-  Both: { label: "NIPR + Commercial", color: "bg-blue-100 text-blue-700", icon: Wifi },
+  NIPR:       { label: "Approved – Official Use (NIPR)",   color: "bg-green-100 text-green-800",  icon: Shield },
+  Commercial: { label: "Personal Use Only – Unclassified", color: "bg-amber-100 text-amber-800",  icon: Globe  },
+  Both:       { label: "Official + Personal",              color: "bg-blue-100 text-blue-700",    icon: Wifi   },
+};
+
+const accessFilterLabel: Record<AccessLevel | "All", string> = {
+  All:        "All",
+  NIPR:       "Official (NIPR)",
+  Commercial: "Personal Use Only",
+  Both:       "Official + Personal",
 };
 
 export default function ToolsPage() {
@@ -52,7 +59,7 @@ export default function ToolsPage() {
                   : "bg-white text-gray-600 border border-gray-200"
               }`}
             >
-              {a}
+              {accessFilterLabel[a]}
             </button>
           ))}
         </div>

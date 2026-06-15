@@ -18,7 +18,7 @@ const features = [
     href: "/tools",
     icon: Wrench,
     title: "AI Tool Catalog",
-    description: "Every AI tool approved for AF use — what it does, where to access, and when to use it.",
+    description: "AI tools for Airmen — which are approved for official NIPR use, and which are personal/unclassified only.",
     stat: `${TOOLS.length} tools`,
     color: "bg-[#002554]",
     accent: "text-[#FFC72C]",
