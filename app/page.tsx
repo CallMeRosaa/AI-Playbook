@@ -37,7 +37,7 @@ const features = [
 ];
 
 const stats = [
-  { icon: Clock, label: "Avg. hrs saved/week", value: "4–6 hrs" },
+  { icon: Clock, label: "Est. hrs saved/week", value: "4–6 hrs" },
   { icon: Zap, label: "Prompts ready to use", value: `${PROMPTS.length}` },
   { icon: Shield, label: "NIPR-approved tools", value: `${TOOLS.filter(t => t.accessLevel !== "Commercial").length}` },
 ];

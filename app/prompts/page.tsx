@@ -112,7 +112,7 @@ export default function PromptsPage() {
                       </span>
                       <span className="flex items-center gap-1 text-[10px] text-gray-400 font-medium">
                         <Clock size={10} />
-                        saves ~{prompt.timeSaved}
+                        saves {prompt.timeSaved}
                       </span>
                       {prompt.sensitive && (
                         <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
@@ -175,6 +175,10 @@ export default function PromptsPage() {
             <p className="text-xs mt-1">Try a different search or category</p>
           </div>
         )}
+
+        <p className="text-[10px] text-gray-400 text-center leading-relaxed px-4 pt-1 pb-2">
+          * Time estimates are illustrative, based on typical task completion time. Individual results vary.
+        </p>
       </div>
     </div>
   );
