@@ -34,12 +34,12 @@ export default function BottomNav() {
               className={`
                 flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 text-xs font-medium
                 transition-colors duration-150
-                ${active ? "text-primary" : "text-gray-400 hover:text-gray-600 active:text-gray-700"}
+                ${active ? "text-primary" : "text-silver hover:text-gray-600 active:text-gray-700"}
               `}
             >
               <span className={`
                 flex items-center justify-center w-8 h-7 rounded-full transition-all duration-200
-                ${active ? "bg-primary/10" : "bg-transparent hover:bg-gray-100"}
+                ${active ? "bg-primary/10" : "bg-transparent hover:bg-silver-tint"}
               `}>
                 <Icon
                   size={20}

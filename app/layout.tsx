@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Public_Sans } from "next/font/google";
+import { Public_Sans, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 
@@ -9,8 +9,14 @@ const publicSans = Public_Sans({
   variable: "--font-public-sans",
 });
 
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["700", "800", "900"],
+  variable: "--font-barlow-condensed",
+});
+
 export const metadata: Metadata = {
-  title: "Airman's AI Playbook",
+  title: "Airman's Playbook",
   description: "Empowering every Airman to reclaim hours through AI — official prompts, tools, and your personal AI context file.",
   manifest: "/manifest.json",
 };
@@ -28,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${publicSans.variable} h-full`}>
+    <html lang="en" className={`${publicSans.variable} ${barlowCondensed.variable} h-full`}>
       <body className="min-h-full bg-background text-foreground font-[family-name:var(--font-public-sans)]">
         <div className="max-w-lg mx-auto min-h-screen relative">
           <div className="bg-warm text-primary-dark text-center text-[10px] font-bold uppercase tracking-widest py-1.5 px-4">

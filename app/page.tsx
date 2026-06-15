@@ -43,12 +43,12 @@ function StatBar() {
   ];
 
   return (
-    <div className="bg-primary-dark text-white px-4 py-3 flex justify-around">
+    <div className="bg-primary-dark text-white px-4 py-3 flex justify-around border-b border-silver-mid/30">
       {statItems.map(({ icon: Icon, label, value }) => (
         <div key={label} className="flex flex-col items-center text-center">
           <Icon size={13} className="text-warm mb-0.5" />
           <span className="text-base font-bold leading-tight tabular-nums">{value}</span>
-          <span className="text-[9px] text-blue-300 leading-tight max-w-[72px] mt-0.5">{label}</span>
+          <span className="text-[9px] text-on-dark-dim leading-tight max-w-[72px] mt-0.5">{label}</span>
         </div>
       ))}
     </div>
@@ -97,28 +97,42 @@ export default function HomePage() {
   return (
     <div className="flex flex-col">
       {/* ── Hero ── */}
-      <div className="relative bg-primary text-white px-5 pt-10 pb-8 overflow-hidden">
+      <div className="relative hero-af text-white px-5 pt-8 pb-8 overflow-hidden">
         {/* Ambient blobs — decorative, pointer-events disabled */}
         <div aria-hidden="true" className="pointer-events-none select-none">
           <div className="hero-blob-1 absolute -top-20 -right-20 w-72 h-72 rounded-full" />
           <div className="hero-blob-2 absolute top-8 -left-24 w-56 h-56 rounded-full" />
         </div>
 
-        {/* Content — sits above blobs */}
-        <div className="relative z-10">
+        {/* Content — centered identity layout */}
+        <div className="relative z-10 flex flex-col items-center text-center">
+          {/* AF Symbol — authorized white version, clear space, no effects applied to the mark */}
+          <div className="mb-5 mt-1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/af-symbol-white.svg"
+              alt="U.S. Air Force"
+              className="h-16 mx-auto"
+              draggable={false}
+            />
+          </div>
+
+          {/* Silver rule — visual separator between Symbol and app wordmark */}
+          <div className="w-12 h-px bg-silver mb-5" aria-hidden="true" />
+
+          {/* Badge row */}
           <div className="flex items-center gap-2 mb-3">
-            <Shield size={13} className="text-warm flex-shrink-0" />
-            <span className="text-[11px] font-bold tracking-widest uppercase text-warm">
+            <Shield size={12} className="text-warm flex-shrink-0" />
+            <span className="text-[10px] font-bold tracking-widest uppercase text-warm">
               PFTU 26-3 · AI Workforce Efficiencies
             </span>
           </div>
-          <h1
-            className="text-3xl font-black uppercase tracking-tight leading-tight mb-2"
-            style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-          >
-            Airman&apos;s<br />AI Playbook
+
+          {/* App wordmark — separated from the Symbol above by the rule and badge row */}
+          <h1 className="font-display text-4xl font-black uppercase tracking-wider leading-tight mb-2">
+            Airman&apos;s<br />Playbook
           </h1>
-          <p className="text-sm text-blue-200 font-medium">
+          <p className="text-sm text-on-dark font-medium">
             Reclaim your time. Expand your mission capacity.
           </p>
         </div>
@@ -155,13 +169,10 @@ export default function HomePage() {
                 </div>
 
                 {/* Title + description */}
-                <h2
-                  className={`text-lg font-black uppercase tracking-tight ${light ? "text-primary" : "text-white"}`}
-                  style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-                >
+                <h2 className={`font-display text-xl font-bold uppercase tracking-wider ${light ? "text-primary" : "text-white"}`}>
                   {title}
                 </h2>
-                <p className={`text-sm mt-1 leading-snug ${light ? "text-primary-dark/80" : "text-blue-100"}`}>
+                <p className={`text-sm mt-1 leading-snug ${light ? "text-primary-dark/80" : "text-on-dark"}`}>
                   {description}
                 </p>
 
@@ -177,7 +188,7 @@ export default function HomePage() {
 
         {/* ── Mission statement ── */}
         <ScrollReveal>
-          <div className="mt-1 mb-2 p-4 rounded-card bg-white border border-gray-100 shadow-resting">
+          <div className="mt-1 mb-2 p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting">
             <p className="text-xs text-gray-500 leading-relaxed text-center">
               <span className="font-bold text-primary">This is not about manpower reduction.</span>{" "}
               It&apos;s about returning capacity to the mission — so Airmen can focus on what matters most.

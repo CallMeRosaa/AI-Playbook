@@ -6,10 +6,10 @@
   --color-af-blue:   #003087;
   --color-af-navy:   #002554;
   --color-af-gold:   #FFC72C;
-  --color-af-silver: #B3B3B3;
+  --color-af-silver: #8A8D8F;   /* Official AF secondary color */
   --color-af-red:    #A6192E;
   --color-af-light:  #F4F6F9;
-  --color-af-muted:  #8C8C8C;
+  --color-af-muted:  #8A8D8F;   /* Aligned with official AF silver */
 
   /* Semantic aliases — use these in components */
   --color-primary:        #003087;   /* = af-blue */
@@ -28,6 +28,15 @@
   --color-warm:      #FFC72C;   /* = af-gold */
   --color-warm-dark: #d9a600;
   --color-warm-tint: #fff4cc;
+
+  /* ─── SILVER SYSTEM — AF secondary #8A8D8F ──────────────────────────────── */
+  --color-silver:      #8A8D8F;   /* Official AF secondary — accents, icons */
+  --color-silver-mid:  #B8BBBD;   /* Dividers, card borders */
+  --color-silver-tint: #EDEEF0;   /* Subtle surface backgrounds */
+
+  /* Text on primary/dark blue backgrounds */
+  --color-on-dark:     #C4D6EC;   /* secondary text on blue hero */
+  --color-on-dark-dim: #8AAECF;   /* muted/label text on blue hero */
 
   /* ─── NEUTRAL GRAYS ─────────────────────────────────────────────────────── */
   --color-gray-900: #111827;
@@ -80,7 +89,8 @@
 
   /* ─── TYPOGRAPHY ────────────────────────────────────────────────────────── */
   --font-sans:    "Public Sans", Arial, Helvetica, sans-serif;
-  --font-display: "Arial Black", "Arial Bold", Arial, sans-serif;
+  /* Barlow Condensed: clean condensed military-document feel for all-caps headings */
+  --font-display: var(--font-barlow-condensed), "Arial Narrow", Arial, sans-serif;
 
   --text-display: 2rem;       /* 32px — page hero      */
   --text-h1:      1.5rem;     /* 24px — section header */
@@ -88,8 +98,9 @@
   --text-body:    0.875rem;   /* 14px — paragraph      */
   --text-caption: 0.6875rem;  /* 11px — badges, meta   */
 
-  --tracking-display: -0.03em;
-  --tracking-heading: -0.02em;
+  /* Wider tracking for uppercase condensed headings — official document feel */
+  --tracking-display: 0.06em;
+  --tracking-heading: 0.03em;
 
   /* ─── ANIMATIONS ────────────────────────────────────────────────────────── */
   --animate-fade-up: fade-up var(--duration-base) var(--ease-smooth) both;
@@ -107,7 +118,8 @@
 }
 
 body {
-  background: var(--color-background);
+  /* Subtle cool-to-neutral gradient gives depth without flat wash */
+  background: linear-gradient(180deg, #E8EEF7 0%, var(--color-background) 40%) fixed;
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -132,17 +144,22 @@ body {
   padding-bottom: 5rem;
 }
 
-/* Frosted glass nav */
+/* Frosted glass nav — silver border gives metallic separation */
 .nav-glass {
   background: color-mix(in srgb, var(--color-surface) 85%, transparent);
   backdrop-filter: blur(12px) saturate(1.5);
   -webkit-backdrop-filter: blur(12px) saturate(1.5);
-  border-top: 1px solid color-mix(in srgb, var(--color-primary) 8%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--color-silver) 22%, transparent);
   transition: box-shadow var(--duration-base) ease, background var(--duration-base) ease;
 }
 .nav-glass.scrolled {
   background: color-mix(in srgb, var(--color-surface) 92%, transparent);
   box-shadow: 0 -4px 16px -4px color-mix(in srgb, var(--color-primary-dark) 12%, transparent);
+}
+
+/* Official AF hero gradient — navy-to-primary, use on all page headers */
+.hero-af {
+  background: linear-gradient(165deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
 }
 
 /* Scroll-reveal sections — opacity only, no translate (restraint) */
@@ -154,12 +171,12 @@ body {
   opacity: 1;
 }
 
-/* Segmented control pill track */
+/* Segmented control pill track — silver-tint gives metallic feel */
 .seg-track {
   position: relative;
   display: flex;
   gap: 0;
-  background: var(--color-gray-100);
+  background: var(--color-silver-tint);
   border-radius: var(--radius-badge);
   padding: 3px;
 }

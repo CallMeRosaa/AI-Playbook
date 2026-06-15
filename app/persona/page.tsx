@@ -51,7 +51,7 @@ const STEPS = [
 
 function Stepper({ current }: { current: number }) {
   return (
-    <div className="px-5 pt-4 pb-3 bg-white border-b border-gray-100">
+    <div className="px-5 pt-4 pb-3 bg-white border-b border-silver-mid/40">
       <div className="flex items-center">
         {STEPS.map((_, i) => (
           <Fragment key={i}>
@@ -113,7 +113,7 @@ function RankSelector({ value, onChange }: { value: string; onChange: (v: string
   );
 
   return (
-    <div className="bg-gray-50 rounded-inner p-3 border border-gray-100">
+    <div className="bg-silver-tint rounded-inner p-3 border border-silver-mid/40">
       <Group label="Enlisted" ranks={ENLISTED_RANKS} />
       <Group label="Officer"  ranks={OFFICER_RANKS}  />
     </div>
@@ -122,7 +122,7 @@ function RankSelector({ value, onChange }: { value: string; onChange: (v: string
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5 block">
+    <label className="text-[10px] font-bold uppercase tracking-wider text-silver mb-1.5 block">
       {children}
     </label>
   );
@@ -248,30 +248,33 @@ export default function PersonaPage() {
   if (persona) {
     return (
       <div className="flex flex-col">
-        <div className="bg-warm px-5 pt-8 pb-5">
+        <div className="hero-af text-white px-5 pt-5 pb-5">
+          <div className="flex items-center gap-3 mb-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
+            <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
+            <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
+          </div>
           <div className="flex items-center gap-3 mb-3">
-            <CheckCircle2 size={30} className="text-primary animate-check-pop flex-shrink-0" />
+            <CheckCircle2 size={28} className="text-warm animate-check-pop flex-shrink-0" />
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-warm block">
                 Context File Ready
               </span>
-              <h1
-                className="text-xl font-black uppercase tracking-tight text-primary leading-tight"
-                style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-              >
+              <h1 className="font-display text-xl font-bold uppercase tracking-wider text-white leading-tight">
                 {form.rank} · {form.afsc}
               </h1>
             </div>
           </div>
-          <p className="text-sm text-primary-dark/80">
+          <p className="text-sm text-on-dark">
             Paste this into any AI tool before your first message.
           </p>
         </div>
 
-        <div className="h-1 bg-primary" />
+        <div className="h-px bg-silver-mid" />
 
         <div className="px-4 pt-4 flex flex-col gap-3 pb-6">
-          <div className="bg-white rounded-card shadow-resting border border-gray-100 p-4">
+          <div className="bg-white rounded-card shadow-resting border border-silver-mid/50 p-4">
             <pre className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">
               {persona}
             </pre>
@@ -324,17 +327,20 @@ export default function PersonaPage() {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="bg-warm px-5 pt-8 pb-5">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+      <div className="hero-af text-white px-5 pt-5 pb-5">
+        <div className="flex items-center gap-3 mb-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
+          <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
+          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
+        </div>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-warm">
           Persona Builder
         </span>
-        <h1
-          className="text-2xl font-black uppercase tracking-tight text-primary leading-tight mt-1"
-          style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-        >
+        <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-white leading-tight mt-1">
           {STEPS[step].label}
         </h1>
-        <p className="text-sm text-primary-dark/70 mt-0.5">{STEPS[step].sublabel}</p>
+        <p className="text-sm text-on-dark mt-0.5">{STEPS[step].sublabel}</p>
       </div>
 
       {/* Stepper */}
@@ -364,7 +370,7 @@ export default function PersonaPage() {
                   placeholder="e.g. 3D1X1"
                   value={form.afsc}
                   onChange={(e) => update("afsc", e.target.value)}
-                  className="w-full border border-gray-200 rounded-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                  className="w-full border border-silver-mid/70 rounded-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                 />
                 <Hint show={attempted && !form.afsc.trim()} text="Enter your AFSC (e.g., 3D1X1)" />
               </div>
@@ -376,7 +382,7 @@ export default function PersonaPage() {
                   placeholder="e.g. Network Admin, Crew Chief, Training NCO"
                   value={form.jobTitle}
                   onChange={(e) => update("jobTitle", e.target.value)}
-                  className="w-full border border-gray-200 rounded-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                  className="w-full border border-silver-mid/70 rounded-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                 />
                 <Hint show={attempted && !form.jobTitle.trim()} text="Enter your job title" />
               </div>
@@ -399,7 +405,7 @@ export default function PersonaPage() {
               placeholder="e.g. Check AROWS for leave requests, pull the maintenance schedule, triage about 30 emails before 0900, then brief the flight chief on overnight issues..."
               value={form.dailyTasks}
               onChange={(e) => update("dailyTasks", e.target.value)}
-              className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none leading-relaxed transition-colors"
+              className="w-full border border-silver-mid/70 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none leading-relaxed transition-colors"
             />
             <Hint
               show={attempted && form.dailyTasks.trim().length <= 20}
@@ -454,7 +460,7 @@ export default function PersonaPage() {
               placeholder="e.g. Writing EPR bullets at the end of every quarter takes me 3-4 hours per person, and I always stare at a blank page for the first hour..."
               value={form.biggestGrind}
               onChange={(e) => update("biggestGrind", e.target.value)}
-              className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none leading-relaxed transition-colors"
+              className="w-full border border-silver-mid/70 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none leading-relaxed transition-colors"
             />
             <Hint
               show={attempted && form.biggestGrind.trim().length <= 10}
@@ -477,7 +483,7 @@ export default function PersonaPage() {
                 placeholder="e.g. AFI 36-2406, T.O. 00-20-1, AFMAN 33-363..."
                 value={form.publications}
                 onChange={(e) => update("publications", e.target.value)}
-                className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none leading-relaxed transition-colors"
+                className="w-full border border-silver-mid/70 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none leading-relaxed transition-colors"
               />
               <button
                 onClick={openEpubs}

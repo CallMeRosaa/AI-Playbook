@@ -121,20 +121,24 @@ export default function PromptsPage() {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="bg-primary text-white px-5 pt-8 pb-5">
-        <h1
-          className="text-2xl font-black uppercase tracking-tight mb-1"
-          style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-        >
+      <div className="hero-af text-white px-5 pt-5 pb-5">
+        {/* Symbol lockup — small mark + wordmark on same row */}
+        <div className="flex items-center gap-3 mb-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
+          <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
+          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
+        </div>
+        <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">
           Prompt Library
         </h1>
-        <p className="text-sm text-blue-200">
+        <p className="text-sm text-on-dark">
           Copy a prompt, fill in the brackets, paste into any AI tool.
         </p>
       </div>
 
-      {/* Gold accent bar */}
-      <div className="h-1 bg-warm" />
+      {/* Silver accent bar — metallic separator */}
+      <div className="h-px bg-silver-mid" />
 
       {/* Search */}
       <div className="px-4 pt-4">
@@ -145,7 +149,7 @@ export default function PromptsPage() {
             placeholder="Search prompts..."
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 rounded-input border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+            className="w-full pl-9 pr-4 py-2.5 rounded-input border border-silver-mid bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
           />
         </div>
       </div>
@@ -177,7 +181,7 @@ export default function PromptsPage() {
           return (
             <div
               key={prompt.id}
-              className="animate-fade-up bg-white rounded-card shadow-resting border border-gray-100 hover:shadow-hover hover:border-primary/20 overflow-hidden transition-all duration-base ease-smooth"
+              className="animate-fade-up bg-white rounded-card shadow-resting border border-silver-mid/50 hover:shadow-hover hover:border-primary/25 overflow-hidden transition-all duration-base ease-smooth"
               style={{ animationDelay: `${Math.min(index * 40, 240)}ms` }}
             >
               <div className={`h-[3px] w-full ${categoryAccent[prompt.category]}`} />
@@ -213,7 +217,7 @@ export default function PromptsPage() {
               </button>
 
               {isExpanded && (
-                <div className="px-5 pb-5 border-t border-gray-100">
+                <div className="px-5 pb-5 border-t border-silver-mid/40">
                   <div className="mt-3 bg-background rounded-inner p-3 relative">
                     <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">
                       {prompt.prompt}

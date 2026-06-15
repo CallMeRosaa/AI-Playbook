@@ -1,6 +1,6 @@
-# Airman's AI Playbook
+# Airman's Playbook
 
-Public home for the **Airman's AI Playbook** and its associated team-facing
+Public home for the **Airman's Playbook** and its associated team-facing
 deliverables — a practical guide to help Airmen at all echelons adopt AI to improve
 productivity and create mission capacity.
 

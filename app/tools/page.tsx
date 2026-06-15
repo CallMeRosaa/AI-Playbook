@@ -106,24 +106,27 @@ export default function ToolsPage() {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="bg-primary-dark text-white px-5 pt-8 pb-5">
-        <h1
-          className="text-2xl font-black uppercase tracking-tight mb-1"
-          style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-        >
+      <div className="hero-af text-white px-5 pt-5 pb-5">
+        <div className="flex items-center gap-3 mb-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
+          <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
+          <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
+        </div>
+        <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">
           AI Tool Catalog
         </h1>
-        <p className="text-sm text-blue-200">
+        <p className="text-sm text-on-dark">
           Know what&apos;s available, what it does, and when to use it.
         </p>
       </div>
 
-      {/* Gold accent bar */}
-      <div className="h-1 bg-warm" />
+      {/* Silver accent bar */}
+      <div className="h-px bg-silver-mid" />
 
       {/* Access filter */}
       <div className="px-4 pt-4">
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Filter by access</p>
+        <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">Filter by access</p>
         <div className="overflow-x-auto">
           <SegmentedFilter
             options={ACCESS_OPTIONS}
@@ -138,7 +141,7 @@ export default function ToolsPage() {
 
       {/* Use case filter */}
       <div className="px-4 pt-3">
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Filter by use case</p>
+        <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">Filter by use case</p>
         <div className="overflow-x-auto pb-1">
           <SegmentedFilter
             options={USE_CASE_OPTIONS}
@@ -163,7 +166,7 @@ export default function ToolsPage() {
           return (
             <div
               key={tool.id}
-              className="animate-fade-up bg-white rounded-card shadow-resting border border-gray-100 hover:shadow-hover hover:border-primary/20 p-5 transition-all duration-base ease-smooth"
+              className="animate-fade-up bg-white rounded-card shadow-resting border border-silver-mid/50 hover:shadow-hover hover:border-primary/25 p-5 transition-all duration-base ease-smooth"
               style={{ animationDelay: `${Math.min(index * 50, 300)}ms` }}
             >
               <div className="flex items-start justify-between gap-3">
