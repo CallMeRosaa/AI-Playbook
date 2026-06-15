@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Official USAF Color Palette */
+  --color-af-blue: #003087;
+  --color-af-navy: #002554;
+  --color-af-gold: #FFC72C;
+  --color-af-silver: #B3B3B3;
+  --color-af-red: #A6192E;
+  --color-af-light: #F4F6F9;
+  --color-af-muted: #8C8C8C;
+
+  /* Semantic aliases */
+  --color-background: #F4F6F9;
+  --color-foreground: #002554;
+  --color-card: #ffffff;
+
+  /* Typography — DAF mandated */
+  --font-sans: "Public Sans", Arial, Helvetica, sans-serif;
+  --font-display: "Arial Black", "Arial Bold", Arial, sans-serif;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Bottom nav safe area on iOS */
+.bottom-nav-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Scrollable page content with bottom nav offset */
+.page-content {
+  padding-bottom: 5rem;
+}
