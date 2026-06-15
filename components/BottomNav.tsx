@@ -24,17 +24,17 @@ export default function BottomNav() {
               key={href}
               href={href}
               className={`flex-1 flex flex-col items-center justify-center py-2 gap-0.5 text-xs font-medium transition-colors ${
-                active ? "text-[#003087]" : "text-gray-400 hover:text-gray-600"
+                active ? "text-primary" : "text-gray-400 hover:text-gray-600"
               }`}
             >
               <Icon
                 size={22}
                 strokeWidth={active ? 2.5 : 1.8}
-                className={active ? "text-[#003087]" : ""}
+                className={active ? "text-primary" : ""}
               />
               <span className={active ? "font-semibold" : ""}>{label}</span>
               {active && (
-                <span className="absolute bottom-0 w-8 h-0.5 bg-[#FFC72C] rounded-t-full" />
+                <span className="absolute bottom-0 w-8 h-0.5 bg-warm rounded-t-full" />
               )}
             </Link>
           );

@@ -29,9 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${publicSans.variable} h-full`}>
-      <body className="min-h-full bg-[#F4F6F9] text-[#002554] font-[family-name:var(--font-public-sans)]">
+      <body className="min-h-full bg-background text-foreground font-[family-name:var(--font-public-sans)]">
         <div className="max-w-lg mx-auto min-h-screen relative">
-          <div className="bg-[#FFC72C] text-[#002554] text-center text-[10px] font-bold uppercase tracking-widest py-1.5 px-4">
+          <div className="bg-warm text-primary-dark text-center text-[10px] font-bold uppercase tracking-widest py-1.5 px-4">
             🚧 Beta — Content and features are actively being developed
           </div>
           <main className="page-content">{children}</main>

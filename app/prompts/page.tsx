@@ -38,7 +38,7 @@ export default function PromptsPage() {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="bg-[#003087] text-white px-5 pt-8 pb-5">
+      <div className="bg-primary text-white px-5 pt-8 pb-5">
         <h1
           className="text-2xl font-black uppercase tracking-tight mb-1"
           style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
@@ -51,7 +51,7 @@ export default function PromptsPage() {
       </div>
 
       {/* Gold accent bar */}
-      <div className="h-1 bg-[#FFC72C]" />
+      <div className="h-1 bg-warm" />
 
       {/* Search */}
       <div className="px-4 pt-4">
@@ -62,7 +62,7 @@ export default function PromptsPage() {
             placeholder="Search prompts..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#003087]/30 focus:border-[#003087]"
+            className="w-full pl-9 pr-4 py-2.5 rounded-input border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
           />
         </div>
       </div>
@@ -73,9 +73,9 @@ export default function PromptsPage() {
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${
+            className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-badge transition-colors ${
               activeCategory === cat
-                ? "bg-[#003087] text-white"
+                ? "bg-primary text-white"
                 : "bg-white text-gray-600 border border-gray-200"
             }`}
           >
@@ -98,7 +98,7 @@ export default function PromptsPage() {
           const isExpanded = expandedId === prompt.id;
           const isCopied = copiedId === prompt.id;
           return (
-            <div key={prompt.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div key={prompt.id} className="bg-white rounded-card shadow-resting border border-gray-100 overflow-hidden">
               {/* Card header */}
               <button
                 onClick={() => setExpandedId(isExpanded ? null : prompt.id)}
@@ -107,7 +107,7 @@ export default function PromptsPage() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${categoryColors[prompt.category]}`}>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-badge ${categoryColors[prompt.category]}`}>
                         {prompt.category}
                       </span>
                       <span className="flex items-center gap-1 text-[10px] text-gray-400 font-medium">
@@ -115,13 +115,13 @@ export default function PromptsPage() {
                         saves {prompt.timeSaved}
                       </span>
                       {prompt.sensitive && (
-                        <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-badge bg-caution-tint text-caution-mid">
                           <ShieldAlert size={10} />
                           Sensitive
                         </span>
                       )}
                     </div>
-                    <h3 className="text-sm font-bold text-[#002554] leading-tight">{prompt.title}</h3>
+                    <h3 className="text-sm font-bold text-primary-dark leading-tight">{prompt.title}</h3>
                     <p className="text-xs text-gray-500 mt-0.5 leading-snug">{prompt.description}</p>
                   </div>
                   <div className="flex-shrink-0 mt-1 text-gray-400">
@@ -133,23 +133,23 @@ export default function PromptsPage() {
               {/* Expanded prompt */}
               {isExpanded && (
                 <div className="px-4 pb-4 border-t border-gray-50">
-                  <div className="mt-3 bg-[#F4F6F9] rounded-xl p-3 relative">
+                  <div className="mt-3 bg-background rounded-inner p-3 relative">
                     <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">
                       {prompt.prompt}
                     </p>
                   </div>
                   {prompt.sensitive && (
-                    <p className="mt-2 flex items-start gap-1.5 text-[10px] font-semibold text-amber-800">
+                    <p className="mt-2 flex items-start gap-1.5 text-[10px] font-semibold text-caution-mid">
                       <ShieldAlert size={11} className="flex-shrink-0 mt-px" />
                       Use a NIPR-approved tool only. Do not enter CUI, classified, or PII.
                     </p>
                   )}
                   <button
                     onClick={() => handleCopy(prompt.id, prompt.prompt)}
-                    className={`mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                    className={`mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold transition-all ${
                       isCopied
                         ? "bg-green-500 text-white"
-                        : "bg-[#003087] text-white active:bg-[#002554]"
+                        : "bg-primary text-white active:bg-primary-dark"
                     }`}
                   >
                     {isCopied ? (

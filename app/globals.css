@@ -1,23 +1,95 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Official USAF Color Palette */
-  --color-af-blue: #003087;
-  --color-af-navy: #002554;
-  --color-af-gold: #FFC72C;
+
+  /* ─── BRAND / PRIMARY — anchor #003087 ─────────────────────────────────── */
+  --color-af-blue:   #003087;
+  --color-af-navy:   #002554;
+  --color-af-gold:   #FFC72C;
   --color-af-silver: #B3B3B3;
-  --color-af-red: #A6192E;
-  --color-af-light: #F4F6F9;
-  --color-af-muted: #8C8C8C;
+  --color-af-red:    #A6192E;
+  --color-af-light:  #F4F6F9;
+  --color-af-muted:  #8C8C8C;
 
-  /* Semantic aliases */
-  --color-background: #F4F6F9;
-  --color-foreground: #002554;
-  --color-card: #ffffff;
+  /* Semantic aliases — use these in components */
+  --color-primary:        #003087;   /* = af-blue */
+  --color-primary-dark:   #002554;   /* = af-navy */
+  --color-primary-deeper: #001a3d;
+  --color-primary-muted:  #1a4fa0;
+  --color-primary-tint:   #cddaf6;   /* light blue chip backgrounds */
+  --color-primary-ghost:  #eff4fd;   /* near-white hover fills */
 
-  /* Typography — DAF mandated */
-  --font-sans: "Public Sans", Arial, Helvetica, sans-serif;
+  /* Tech accent — electric sky blue, AI feel, use sparingly */
+  --color-tech:      #0ea5e9;
+  --color-tech-dim:  #0284c7;
+  --color-tech-tint: #e0f2fe;
+
+  /* Warm accent — AF heritage gold */
+  --color-warm:      #FFC72C;   /* = af-gold */
+  --color-warm-dark: #d9a600;
+  --color-warm-tint: #fff4cc;
+
+  /* ─── NEUTRAL GRAYS ─────────────────────────────────────────────────────── */
+  --color-gray-900: #111827;
+  --color-gray-700: #374151;
+  --color-gray-500: #6b7280;
+  --color-gray-400: #9ca3af;
+  --color-gray-300: #d1d5db;
+  --color-gray-200: #e5e7eb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-50:  #f9fafb;
+
+  /* ─── SEMANTIC COLORS ───────────────────────────────────────────────────── */
+  /* success — NIPR/official-use access badges, positive states */
+  --color-success:      #16a34a;
+  --color-success-mid:  #166534;
+  --color-success-tint: #dcfce7;
+
+  /* caution — personal-use-only badges, sensitive prompt flags */
+  --color-caution:      #d97706;
+  --color-caution-mid:  #92400e;
+  --color-caution-tint: #fef3c7;
+
+  /* danger — error states, hard warnings */
+  --color-danger:      #dc2626;
+  --color-danger-mid:  #991b1b;
+  --color-danger-tint: #fee2e2;
+
+  /* page-level */
+  --color-background: #F4F6F9;   /* = af-light */
+  --color-foreground: #002554;   /* = af-navy */
+  --color-surface:    #ffffff;
+
+  /* ─── ELEVATION — blue-tinted, soft layered shadows ────────────────────── */
+  --shadow-resting: 0 1px 2px 0 rgb(0 37 84 / 0.06);
+  --shadow-hover:   0 4px 8px -2px rgb(0 37 84 / 0.10), 0 2px 4px -2px rgb(0 37 84 / 0.06);
+  --shadow-raised:  0 8px 16px -4px rgb(0 37 84 / 0.14), 0 4px 6px -4px rgb(0 37 84 / 0.08);
+  --shadow-modal:   0 20px 40px -8px rgb(0 37 84 / 0.20), 0 8px 16px -8px rgb(0 37 84 / 0.12);
+
+  /* ─── RADIUS ────────────────────────────────────────────────────────────── */
+  --radius-badge: 9999px;   /* pill chips, filter buttons */
+  --radius-card:  16px;     /* primary card containers   */
+  --radius-inner: 12px;     /* nested elements, buttons  */
+  --radius-input: 12px;     /* form controls             */
+
+  /* ─── MOTION ────────────────────────────────────────────────────────────── */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --ease-smooth:   cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ─── TYPOGRAPHY ────────────────────────────────────────────────────────── */
+  --font-sans:    "Public Sans", Arial, Helvetica, sans-serif;
   --font-display: "Arial Black", "Arial Bold", Arial, sans-serif;
+
+  --text-display: 2rem;       /* 32px — page hero      */
+  --text-h1:      1.5rem;     /* 24px — section header */
+  --text-h2:      1.125rem;   /* 18px — card title     */
+  --text-body:    0.875rem;   /* 14px — paragraph      */
+  --text-caption: 0.6875rem;  /* 11px — badges, meta   */
+
+  --tracking-display: -0.03em;
+  --tracking-heading: -0.02em;
 }
 
 body {
@@ -25,6 +97,15 @@ body {
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* ─── REDUCED MOTION ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Bottom nav safe area on iOS */

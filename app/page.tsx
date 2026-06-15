@@ -10,8 +10,8 @@ const features = [
     title: "Prompt Library",
     description: "Ready-to-use AI prompts for EPRs, emails, briefs, and more — tailored for Airmen.",
     stat: `${PROMPTS.length} prompts`,
-    color: "bg-[#003087]",
-    accent: "text-[#FFC72C]",
+    color: "bg-primary",
+    accent: "text-warm",
     light: false,
   },
   {
@@ -20,8 +20,8 @@ const features = [
     title: "AI Tool Catalog",
     description: "AI tools for Airmen — which are approved for official NIPR use, and which are personal/unclassified only.",
     stat: `${TOOLS.length} tools`,
-    color: "bg-[#002554]",
-    accent: "text-[#FFC72C]",
+    color: "bg-primary-dark",
+    accent: "text-warm",
     light: false,
   },
   {
@@ -30,8 +30,8 @@ const features = [
     title: "Airman Persona Builder",
     description: "Build your personal AI context file. Paste it into any AI tool and instantly get better outputs.",
     stat: "2 min setup",
-    color: "bg-[#FFC72C]",
-    accent: "text-[#003087]",
+    color: "bg-warm",
+    accent: "text-primary",
     light: true,
   },
 ];
@@ -46,10 +46,10 @@ export default function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="bg-[#003087] text-white px-5 pt-10 pb-8">
+      <div className="bg-primary text-white px-5 pt-10 pb-8">
         <div className="flex items-center gap-2 mb-2">
-          <Shield size={14} className="text-[#FFC72C]" />
-          <span className="text-[10px] font-bold tracking-widest uppercase text-[#FFC72C]">
+          <Shield size={14} className="text-warm" />
+          <span className="text-[10px] font-bold tracking-widest uppercase text-warm">
             PFTU 26-3 · AI Workforce Efficiencies
           </span>
         </div>
@@ -65,10 +65,10 @@ export default function HomePage() {
       </div>
 
       {/* Stats bar */}
-      <div className="bg-[#002554] text-white px-4 py-3 flex justify-around">
+      <div className="bg-primary-dark text-white px-4 py-3 flex justify-around">
         {stats.map(({ icon: Icon, label, value }) => (
           <div key={label} className="flex flex-col items-center text-center">
-            <Icon size={13} className="text-[#FFC72C] mb-0.5" />
+            <Icon size={13} className="text-warm mb-0.5" />
             <span className="text-base font-bold leading-tight">{value}</span>
             <span className="text-[9px] text-blue-300 leading-tight max-w-[72px] mt-0.5">{label}</span>
           </div>
@@ -83,22 +83,22 @@ export default function HomePage() {
 
         {features.map(({ href, icon: Icon, title, description, stat, color, accent, light }) => (
           <Link key={href} href={href}>
-            <div className={`${color} rounded-2xl p-5 shadow-sm active:scale-[0.98] transition-transform`}>
+            <div className={`${color} rounded-card p-5 shadow-resting active:scale-[0.98] transition-transform`}>
               <div className="flex items-start justify-between mb-3">
-                <div className="p-2 rounded-xl bg-white/15">
+                <div className="p-2 rounded-inner bg-white/15">
                   <Icon size={20} className={accent} />
                 </div>
-                <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/20 ${accent}`}>
+                <span className={`text-[11px] font-bold px-2.5 py-1 rounded-badge bg-white/20 ${accent}`}>
                   {stat}
                 </span>
               </div>
               <h2
-                className={`text-lg font-black uppercase tracking-tight ${light ? "text-[#003087]" : "text-white"}`}
+                className={`text-lg font-black uppercase tracking-tight ${light ? "text-primary" : "text-white"}`}
                 style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
               >
                 {title}
               </h2>
-              <p className={`text-sm mt-1 leading-snug ${light ? "text-[#002554]/80" : "text-blue-100"}`}>
+              <p className={`text-sm mt-1 leading-snug ${light ? "text-primary-dark/80" : "text-blue-100"}`}>
                 {description}
               </p>
             </div>
@@ -106,9 +106,9 @@ export default function HomePage() {
         ))}
 
         {/* Mission statement */}
-        <div className="mt-1 p-4 rounded-2xl bg-white border border-gray-100 shadow-sm">
+        <div className="mt-1 p-4 rounded-card bg-white border border-gray-100 shadow-resting">
           <p className="text-[11px] text-gray-500 leading-relaxed text-center">
-            <span className="font-bold text-[#003087]">This is not about manpower reduction.</span>{" "}
+            <span className="font-bold text-primary">This is not about manpower reduction.</span>{" "}
             It&apos;s about returning capacity to the mission — so you can focus on what matters most.
           </p>
         </div>

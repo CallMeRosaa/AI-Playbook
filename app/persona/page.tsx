@@ -141,28 +141,28 @@ export default function PersonaPage() {
   if (persona) {
     return (
       <div className="flex flex-col">
-        <div className="bg-[#FFC72C] px-5 pt-8 pb-5">
+        <div className="bg-warm px-5 pt-8 pb-5">
           <div className="flex items-center gap-2 mb-2">
-            <Sparkles size={18} className="text-[#003087]" />
-            <span className="text-xs font-bold uppercase tracking-wider text-[#003087]">
+            <Sparkles size={18} className="text-primary" />
+            <span className="text-xs font-bold uppercase tracking-wider text-primary">
               Your AI Context File
             </span>
           </div>
           <h1
-            className="text-2xl font-black uppercase tracking-tight text-[#003087] leading-tight"
+            className="text-2xl font-black uppercase tracking-tight text-primary leading-tight"
             style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
           >
             {form.rank} · {form.afsc}
           </h1>
-          <p className="text-sm text-[#002554]/80 mt-1">
+          <p className="text-sm text-primary-dark/80 mt-1">
             Paste this into any AI tool before your first message.
           </p>
         </div>
 
-        <div className="h-1 bg-[#003087]" />
+        <div className="h-1 bg-primary" />
 
         <div className="px-4 pt-4 flex flex-col gap-3 pb-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <div className="bg-white rounded-card shadow-resting border border-gray-100 p-4">
             <pre className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">
               {persona}
             </pre>
@@ -170,8 +170,8 @@ export default function PersonaPage() {
 
           <button
             onClick={handleCopy}
-            className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
-              copied ? "bg-green-500 text-white" : "bg-[#003087] text-white"
+            className={`w-full flex items-center justify-center gap-2 py-3 rounded-inner text-sm font-bold transition-all ${
+              copied ? "bg-green-500 text-white" : "bg-primary text-white"
             }`}
           >
             {copied ? <><Check size={16} /> Copied!</> : <><Copy size={16} /> Copy to Clipboard</>}
@@ -179,7 +179,7 @@ export default function PersonaPage() {
 
           <button
             onClick={handleDownload}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold bg-white border border-gray-200 text-[#003087]"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-inner text-sm font-bold bg-white border border-gray-200 text-primary"
           >
             <Download size={16} /> Download as .txt
           </button>
@@ -188,8 +188,8 @@ export default function PersonaPage() {
             Start over
           </button>
 
-          <div className="p-4 rounded-2xl bg-[#003087]/5 border border-[#003087]/10">
-            <p className="text-xs text-[#002554] font-semibold mb-1">How to use this</p>
+          <div className="p-4 rounded-card bg-primary/5 border border-primary/10">
+            <p className="text-xs text-primary-dark font-semibold mb-1">How to use this</p>
             <p className="text-xs text-gray-600 leading-relaxed">
               Paste this entire file into the first message of any AI session —
               GenAI.mil, NIPRGPT, Claude, or ChatGPT. The AI will immediately
@@ -204,27 +204,27 @@ export default function PersonaPage() {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="bg-[#FFC72C] px-5 pt-8 pb-5">
-        <span className="text-xs font-bold uppercase tracking-wider text-[#003087]">
+      <div className="bg-warm px-5 pt-8 pb-5">
+        <span className="text-xs font-bold uppercase tracking-wider text-primary">
           Persona Builder
         </span>
         <h1
-          className="text-2xl font-black uppercase tracking-tight text-[#003087] leading-tight mt-1"
+          className="text-2xl font-black uppercase tracking-tight text-primary leading-tight mt-1"
           style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
         >
           {STEPS[step].label}
         </h1>
-        <p className="text-sm text-[#002554]/70 mt-0.5">{STEPS[step].sublabel}</p>
+        <p className="text-sm text-primary-dark/70 mt-0.5">{STEPS[step].sublabel}</p>
       </div>
 
       {/* Progress bar */}
-      <div className="bg-[#003087] px-4 py-2.5 flex items-center gap-3">
+      <div className="bg-primary px-4 py-2.5 flex items-center gap-3">
         <div className="flex gap-1 flex-1">
           {STEPS.map((_, i) => (
             <div
               key={i}
-              className={`h-1 flex-1 rounded-full transition-colors ${
-                i <= step ? "bg-[#FFC72C]" : "bg-white/20"
+              className={`h-1 flex-1 rounded-badge transition-colors ${
+                i <= step ? "bg-warm" : "bg-white/20"
               }`}
             />
           ))}
@@ -239,7 +239,7 @@ export default function PersonaPage() {
         {/* Step 0 — Identity */}
         {step === 0 && (
           <>
-            <p className="text-base font-semibold text-[#002554] leading-snug">
+            <p className="text-base font-semibold text-primary-dark leading-snug">
               What&apos;s your rank, AFSC, and what do people call your job?
             </p>
             <div className="flex flex-col gap-3">
@@ -248,7 +248,7 @@ export default function PersonaPage() {
                 <select
                   value={form.rank}
                   onChange={(e) => update("rank", e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#003087]/30"
+                  className="w-full border border-gray-200 rounded-input px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   <option value="">Select rank...</option>
                   {RANKS.map((r) => <option key={r} value={r}>{r}</option>)}
@@ -261,7 +261,7 @@ export default function PersonaPage() {
                   placeholder="e.g. 3D1X1"
                   value={form.afsc}
                   onChange={(e) => update("afsc", e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003087]/30"
+                  className="w-full border border-gray-200 rounded-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
               <div>
@@ -273,7 +273,7 @@ export default function PersonaPage() {
                   placeholder="e.g. Network Admin, Crew Chief, Training NCO"
                   value={form.jobTitle}
                   onChange={(e) => update("jobTitle", e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#003087]/30"
+                  className="w-full border border-gray-200 rounded-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
             </div>
@@ -283,7 +283,7 @@ export default function PersonaPage() {
         {/* Step 1 — Daily Tasks */}
         {step === 1 && (
           <>
-            <p className="text-base font-semibold text-[#002554] leading-snug">
+            <p className="text-base font-semibold text-primary-dark leading-snug">
               Walk me through your average duty day. What are the first things you actually <em>do</em> when you sit down?
             </p>
             <p className="text-xs text-gray-400 -mt-2">
@@ -294,7 +294,7 @@ export default function PersonaPage() {
               placeholder="e.g. Check AROWS for leave requests, pull the maintenance schedule, triage about 30 emails before 0900, then brief the flight chief on overnight issues..."
               value={form.dailyTasks}
               onChange={(e) => update("dailyTasks", e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#003087]/30 resize-none leading-relaxed"
+              className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none leading-relaxed"
             />
 
             {/* AFSC-based task suggestions */}
@@ -312,10 +312,10 @@ export default function PersonaPage() {
                         type="button"
                         onClick={() => !isAdded && appendTask(task)}
                         disabled={isAdded}
-                        className={`flex items-center gap-2 text-left text-xs px-3 py-2.5 rounded-xl border transition-colors ${
+                        className={`flex items-center gap-2 text-left text-xs px-3 py-2.5 rounded-inner border transition-colors ${
                           isAdded
                             ? "bg-green-50 border-green-200 text-green-600 cursor-default"
-                            : "bg-white border-gray-200 text-gray-600 active:bg-[#003087]/5"
+                            : "bg-white border-gray-200 text-gray-600 active:bg-primary/5"
                         }`}
                       >
                         <CheckCircle2
@@ -335,7 +335,7 @@ export default function PersonaPage() {
         {/* Step 2 — Biggest Grind */}
         {step === 2 && (
           <>
-            <p className="text-base font-semibold text-[#002554] leading-snug">
+            <p className="text-base font-semibold text-primary-dark leading-snug">
               What recurring task takes up the most of your time — or feels like the biggest grind?
             </p>
             <p className="text-xs text-gray-400 -mt-2">
@@ -346,7 +346,7 @@ export default function PersonaPage() {
               placeholder="e.g. Writing EPR bullets at the end of every quarter takes me 3-4 hours per person, and I always stare at a blank page for the first hour..."
               value={form.biggestGrind}
               onChange={(e) => update("biggestGrind", e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#003087]/30 resize-none leading-relaxed"
+              className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none leading-relaxed"
             />
           </>
         )}
@@ -354,7 +354,7 @@ export default function PersonaPage() {
         {/* Step 3 — Duties & References */}
         {step === 3 && (
           <>
-            <p className="text-base font-semibold text-[#002554] leading-snug">
+            <p className="text-base font-semibold text-primary-dark leading-snug">
               What AFIs or TOs do you work from — and what additional programs do you manage?
             </p>
 
@@ -368,11 +368,11 @@ export default function PersonaPage() {
                 placeholder="e.g. AFI 36-2406, T.O. 00-20-1, AFMAN 33-363..."
                 value={form.publications}
                 onChange={(e) => update("publications", e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#003087]/30 resize-none leading-relaxed"
+                className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none leading-relaxed"
               />
               <button
                 onClick={openEpubs}
-                className="mt-2 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-[#003087] text-[#003087] text-xs font-bold bg-white"
+                className="mt-2 flex items-center justify-center gap-2 w-full py-2.5 rounded-inner border border-primary text-primary text-xs font-bold bg-white"
               >
                 <ExternalLink size={13} />
                 Search AF e-Publishing (EPUBS)
@@ -396,9 +396,9 @@ export default function PersonaPage() {
                       type="button"
                       onClick={() => toggleDuty(duty.id)}
                       title={duty.description}
-                      className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
+                      className={`text-xs font-semibold px-3 py-1.5 rounded-badge border transition-colors ${
                         selected
-                          ? "bg-[#003087] text-white border-[#003087]"
+                          ? "bg-primary text-white border-primary"
                           : "bg-white text-gray-600 border-gray-200"
                       }`}
                     >
@@ -409,7 +409,7 @@ export default function PersonaPage() {
                 })}
               </div>
               {form.additionalDuties.length > 0 && (
-                <p className="text-[10px] text-[#003087] font-medium mt-2">
+                <p className="text-[10px] text-primary font-medium mt-2">
                   {form.additionalDuties.length} program{form.additionalDuties.length !== 1 ? "s" : ""} selected
                 </p>
               )}
@@ -420,7 +420,7 @@ export default function PersonaPage() {
         {/* Step 4 — AI Style */}
         {step === 4 && (
           <>
-            <p className="text-base font-semibold text-[#002554] leading-snug">
+            <p className="text-base font-semibold text-primary-dark leading-snug">
               When AI gives you a perfect answer, what does it look like?
             </p>
             <div className="flex flex-col gap-2">
@@ -428,9 +428,9 @@ export default function PersonaPage() {
                 <button
                   key={opt.value}
                   onClick={() => update("aiStyle", opt.value)}
-                  className={`text-left text-sm font-medium px-4 py-3.5 rounded-xl border transition-colors ${
+                  className={`text-left text-sm font-medium px-4 py-3.5 rounded-inner border transition-colors ${
                     form.aiStyle === opt.value
-                      ? "bg-[#003087] text-white border-[#003087]"
+                      ? "bg-primary text-white border-primary"
                       : "bg-white text-gray-700 border-gray-200"
                   }`}
                 >
@@ -446,7 +446,7 @@ export default function PersonaPage() {
           {step > 0 && (
             <button
               onClick={() => setStep((s) => s - 1)}
-              className="flex items-center gap-1 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-600"
+              className="flex items-center gap-1 px-4 py-3 rounded-inner border border-gray-200 bg-white text-sm font-semibold text-gray-600"
             >
               <ChevronLeft size={16} /> Back
             </button>
@@ -455,9 +455,9 @@ export default function PersonaPage() {
             <button
               onClick={() => setStep((s) => s + 1)}
               disabled={!canAdvance()}
-              className={`flex-1 flex items-center justify-center gap-1 py-3 rounded-xl text-sm font-bold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1 py-3 rounded-inner text-sm font-bold transition-all ${
                 canAdvance()
-                  ? "bg-[#003087] text-white"
+                  ? "bg-primary text-white"
                   : "bg-gray-100 text-gray-400 cursor-not-allowed"
               }`}
             >
@@ -467,10 +467,10 @@ export default function PersonaPage() {
             <button
               onClick={handleGenerate}
               disabled={loading || !canAdvance()}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-inner text-sm font-bold transition-all ${
                 loading || !canAdvance()
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-[#FFC72C] text-[#003087]"
+                  : "bg-warm text-primary"
               }`}
             >
               {loading ? (

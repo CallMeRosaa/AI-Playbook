@@ -5,9 +5,9 @@ import { ExternalLink, Shield, Wifi, Globe } from "lucide-react";
 import { TOOLS, USE_CASES, type AccessLevel, type UseCase } from "@/lib/mock/tools";
 
 const accessBadge: Record<AccessLevel, { label: string; color: string; icon: typeof Shield }> = {
-  NIPR:       { label: "Approved – Official Use (NIPR)",   color: "bg-green-100 text-green-800",  icon: Shield },
-  Commercial: { label: "Personal Use Only – Unclassified", color: "bg-amber-100 text-amber-800",  icon: Globe  },
-  Both:       { label: "Official + Personal",              color: "bg-blue-100 text-blue-700",    icon: Wifi   },
+  NIPR:       { label: "Approved – Official Use (NIPR)",   color: "bg-success-tint text-success-mid", icon: Shield },
+  Commercial: { label: "Personal Use Only – Unclassified", color: "bg-caution-tint text-caution-mid", icon: Globe  },
+  Both:       { label: "Official + Personal",              color: "bg-primary-tint text-primary",      icon: Wifi   },
 };
 
 const accessFilterLabel: Record<AccessLevel | "All", string> = {
@@ -30,7 +30,7 @@ export default function ToolsPage() {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="bg-[#002554] text-white px-5 pt-8 pb-5">
+      <div className="bg-primary-dark text-white px-5 pt-8 pb-5">
         <h1
           className="text-2xl font-black uppercase tracking-tight mb-1"
           style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
@@ -43,7 +43,7 @@ export default function ToolsPage() {
       </div>
 
       {/* Gold accent bar */}
-      <div className="h-1 bg-[#FFC72C]" />
+      <div className="h-1 bg-warm" />
 
       {/* Access filter */}
       <div className="px-4 pt-4">
@@ -53,9 +53,9 @@ export default function ToolsPage() {
             <button
               key={a}
               onClick={() => setActiveAccess(a)}
-              className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${
+              className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-badge transition-colors ${
                 activeAccess === a
-                  ? "bg-[#002554] text-white"
+                  ? "bg-primary-dark text-white"
                   : "bg-white text-gray-600 border border-gray-200"
               }`}
             >
@@ -73,9 +73,9 @@ export default function ToolsPage() {
             <button
               key={u}
               onClick={() => setActiveUseCase(u)}
-              className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${
+              className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-badge transition-colors ${
                 activeUseCase === u
-                  ? "bg-[#FFC72C] text-[#002554]"
+                  ? "bg-warm text-primary-dark"
                   : "bg-white text-gray-600 border border-gray-200"
               }`}
             >
@@ -96,27 +96,27 @@ export default function ToolsPage() {
           const badge = accessBadge[tool.accessLevel];
           const BadgeIcon = badge.icon;
           return (
-            <div key={tool.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+            <div key={tool.id} className="bg-white rounded-card shadow-resting border border-gray-100 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   <span className="text-2xl leading-none mt-0.5">{tool.icon}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                      <h3 className="text-sm font-bold text-[#002554]">{tool.name}</h3>
+                      <h3 className="text-sm font-bold text-primary-dark">{tool.name}</h3>
                       {tool.badge && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#003087] text-white uppercase tracking-wide">
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary text-white uppercase tracking-wide">
                           {tool.badge}
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] text-[#003087] font-semibold">{tool.tagline}</p>
+                    <p className="text-[11px] text-primary font-semibold">{tool.tagline}</p>
                   </div>
                 </div>
                 <a
                   href={tool.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-shrink-0 p-2 rounded-xl bg-[#F4F6F9] text-[#003087] hover:bg-[#003087] hover:text-white transition-colors"
+                  className="flex-shrink-0 p-2 rounded-inner bg-background text-primary hover:bg-primary hover:text-white transition-colors"
                   aria-label={`Open ${tool.name}`}
                 >
                   <ExternalLink size={15} />
@@ -126,12 +126,12 @@ export default function ToolsPage() {
               <p className="text-xs text-gray-600 mt-2 leading-relaxed">{tool.description}</p>
 
               <div className="flex items-center gap-2 mt-3 flex-wrap">
-                <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full ${badge.color}`}>
+                <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-badge ${badge.color}`}>
                   <BadgeIcon size={10} />
                   {badge.label}
                 </span>
                 {tool.useCases.map((uc) => (
-                  <span key={uc} className="text-[10px] font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-500">
+                  <span key={uc} className="text-[10px] font-medium px-2 py-1 rounded-badge bg-gray-100 text-gray-500">
                     {uc}
                   </span>
                 ))}
@@ -145,7 +145,7 @@ export default function ToolsPage() {
             <p className="text-sm font-medium">No tools match your filters</p>
             <button
               onClick={() => { setActiveAccess("All"); setActiveUseCase("All"); }}
-              className="text-xs text-[#003087] font-semibold mt-2"
+              className="text-xs text-primary font-semibold mt-2"
             >
               Clear filters
             </button>
@@ -153,8 +153,8 @@ export default function ToolsPage() {
         )}
 
         {/* Disclaimer */}
-        <div className="mt-1 p-3 rounded-xl bg-[#FFC72C]/10 border border-[#FFC72C]/30">
-          <p className="text-[10px] text-[#002554] leading-relaxed">
+        <div className="mt-1 p-3 rounded-inner bg-warm/10 border border-warm/30">
+          <p className="text-[10px] text-primary-dark leading-relaxed">
             <span className="font-bold">OPSEC reminder:</span> Never enter classified, CUI, or PII into commercial AI tools. Use NIPR-approved platforms for all sensitive work.
           </p>
         </div>
