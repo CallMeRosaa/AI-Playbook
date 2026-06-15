@@ -90,6 +90,14 @@
 
   --tracking-display: -0.03em;
   --tracking-heading: -0.02em;
+
+  /* ─── ANIMATIONS ────────────────────────────────────────────────────────── */
+  --animate-fade-up: fade-up var(--duration-base) var(--ease-smooth) both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
 body {

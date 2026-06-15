@@ -4,13 +4,24 @@ import { useState } from "react";
 import { Search, Copy, Check, Clock, ChevronDown, ChevronUp, ShieldAlert } from "lucide-react";
 import { PROMPTS, CATEGORIES, type PromptCategory } from "@/lib/mock/prompts";
 
+// Badge: pill behind the category name
 const categoryColors: Record<PromptCategory, string> = {
-  Admin: "bg-blue-100 text-blue-700",
-  Comms: "bg-purple-100 text-purple-700",
-  Training: "bg-green-100 text-green-700",
+  Admin:      "bg-blue-100 text-blue-700",
+  Comms:      "bg-purple-100 text-purple-700",
+  Training:   "bg-green-100 text-green-700",
   Operations: "bg-orange-100 text-orange-700",
-  Logistics: "bg-yellow-100 text-yellow-700",
-  Intel: "bg-red-100 text-red-700",
+  Logistics:  "bg-yellow-100 text-yellow-700",
+  Intel:      "bg-red-100 text-red-700",
+};
+
+// Accent bar: 3 px top stripe that gives each category a distinct color lane
+const categoryAccent: Record<PromptCategory, string> = {
+  Admin:      "bg-primary",
+  Comms:      "bg-purple-500",
+  Training:   "bg-success",
+  Operations: "bg-orange-500",
+  Logistics:  "bg-yellow-500",
+  Intel:      "bg-danger",
 };
 
 export default function PromptsPage() {
@@ -94,26 +105,36 @@ export default function PromptsPage() {
 
       {/* Prompt cards */}
       <div className="px-4 flex flex-col gap-3 pb-4">
-        {filtered.map((prompt) => {
+        {filtered.map((prompt, index) => {
           const isExpanded = expandedId === prompt.id;
           const isCopied = copiedId === prompt.id;
           return (
-            <div key={prompt.id} className="bg-white rounded-card shadow-resting border border-gray-100 overflow-hidden">
+            <div
+              key={prompt.id}
+              className="animate-fade-up bg-white rounded-card shadow-resting border border-gray-100 hover:shadow-hover hover:border-primary/20 overflow-hidden transition-all duration-base ease-smooth"
+              style={{ animationDelay: `${Math.min(index * 40, 240)}ms` }}
+            >
+              {/* Category accent bar */}
+              <div className={`h-[3px] w-full ${categoryAccent[prompt.category]}`} />
+
               {/* Card header */}
               <button
                 onClick={() => setExpandedId(isExpanded ? null : prompt.id)}
-                className="w-full text-left p-4"
+                className="w-full text-left p-5"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                      {/* Category badge */}
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-badge ${categoryColors[prompt.category]}`}>
                         {prompt.category}
                       </span>
-                      <span className="flex items-center gap-1 text-[10px] text-gray-400 font-medium">
-                        <Clock size={10} />
-                        saves {prompt.timeSaved}
+                      {/* Time saved pill */}
+                      <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-badge bg-gray-100 text-gray-500">
+                        <Clock size={9} />
+                        {prompt.timeSaved}
                       </span>
+                      {/* Sensitive / CUI flag */}
                       {prompt.sensitive && (
                         <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-badge bg-caution-tint text-caution-mid">
                           <ShieldAlert size={10} />
@@ -132,7 +153,7 @@ export default function PromptsPage() {
 
               {/* Expanded prompt */}
               {isExpanded && (
-                <div className="px-4 pb-4 border-t border-gray-50">
+                <div className="px-5 pb-5 border-t border-gray-100">
                   <div className="mt-3 bg-background rounded-inner p-3 relative">
                     <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">
                       {prompt.prompt}

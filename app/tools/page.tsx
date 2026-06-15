@@ -92,11 +92,15 @@ export default function ToolsPage() {
 
       {/* Tool cards */}
       <div className="px-4 flex flex-col gap-3 pb-4">
-        {filtered.map((tool) => {
+        {filtered.map((tool, index) => {
           const badge = accessBadge[tool.accessLevel];
           const BadgeIcon = badge.icon;
           return (
-            <div key={tool.id} className="bg-white rounded-card shadow-resting border border-gray-100 p-4">
+            <div
+              key={tool.id}
+              className="animate-fade-up bg-white rounded-card shadow-resting border border-gray-100 hover:shadow-hover hover:border-primary/20 p-5 transition-all duration-base ease-smooth"
+              style={{ animationDelay: `${Math.min(index * 50, 300)}ms` }}
+            >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   <span className="text-2xl leading-none mt-0.5">{tool.icon}</span>
