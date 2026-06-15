@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useLayoutEffect, useCallback } from "react";
 import { ExternalLink, Shield, Wifi, Globe } from "lucide-react";
 import { TOOLS, USE_CASES, type AccessLevel, type UseCase } from "@/lib/mock/tools";
 
@@ -17,13 +17,89 @@ const accessFilterLabel: Record<AccessLevel | "All", string> = {
   Both:       "Official + Personal",
 };
 
+const ACCESS_OPTIONS = (["All", "NIPR", "Commercial", "Both"] as (AccessLevel | "All")[]);
+const USE_CASE_OPTIONS = (["All", ...USE_CASES] as (UseCase | "All")[]);
+
+function SegmentedFilter<T extends string>({
+  options,
+  labels,
+  active,
+  onChange,
+  pillColor = "bg-primary-dark",
+  activeTextColor = "text-white",
+}: {
+  options: T[];
+  labels?: Record<T, string>;
+  active: T;
+  onChange: (v: T) => void;
+  pillColor?: string;
+  activeTextColor?: string;
+}) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [pill, setPill] = useState({ left: 0, width: 0 });
+
+  const updatePill = useCallback(() => {
+    const idx = options.indexOf(active);
+    const btn = btnRefs.current[idx];
+    const track = trackRef.current;
+    if (!btn || !track) return;
+    const trackRect = track.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    setPill({ left: btnRect.left - trackRect.left, width: btnRect.width });
+  }, [active, options]);
+
+  useLayoutEffect(() => { updatePill(); }, [updatePill]);
+
+  return (
+    <div ref={trackRef} className="seg-track">
+      <div
+        className={`seg-pill ${pillColor}`}
+        style={{ left: pill.left, width: pill.width }}
+      />
+      {options.map((opt, i) => (
+        <button
+          key={opt}
+          ref={el => { btnRefs.current[i] = el; }}
+          onClick={() => onChange(opt)}
+          className={`seg-btn ${active === opt ? activeTextColor : "text-gray-500"}`}
+        >
+          {labels ? labels[opt] : opt}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function ToolsPage() {
   const [activeAccess, setActiveAccess] = useState<AccessLevel | "All">("All");
   const [activeUseCase, setActiveUseCase] = useState<UseCase | "All">("All");
+  const [fading, setFading] = useState(false);
+  const [displayAccess, setDisplayAccess] = useState<AccessLevel | "All">("All");
+  const [displayUseCase, setDisplayUseCase] = useState<UseCase | "All">("All");
+
+  const applyFilter = useCallback((acc: AccessLevel | "All", uc: UseCase | "All") => {
+    setFading(true);
+    setTimeout(() => {
+      setDisplayAccess(acc);
+      setDisplayUseCase(uc);
+      setFading(false);
+    }, 130);
+  }, []);
+
+  const handleAccess = (a: AccessLevel | "All") => {
+    setActiveAccess(a);
+    applyFilter(a, activeUseCase);
+  };
+
+  const handleUseCase = (u: UseCase | "All") => {
+    setActiveUseCase(u);
+    applyFilter(activeAccess, u);
+  };
 
   const filtered = TOOLS.filter((t) => {
-    const matchesAccess = activeAccess === "All" || t.accessLevel === activeAccess;
-    const matchesUseCase = activeUseCase === "All" || t.useCases.includes(activeUseCase);
+    const matchesAccess = displayAccess === "All" || t.accessLevel === displayAccess;
+    const matchesUseCase = displayUseCase === "All" || t.useCases.includes(displayUseCase);
     return matchesAccess && matchesUseCase;
   });
 
@@ -48,40 +124,29 @@ export default function ToolsPage() {
       {/* Access filter */}
       <div className="px-4 pt-4">
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Filter by access</p>
-        <div className="flex gap-2 overflow-x-auto">
-          {(["All", "NIPR", "Commercial", "Both"] as (AccessLevel | "All")[]).map((a) => (
-            <button
-              key={a}
-              onClick={() => setActiveAccess(a)}
-              className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-badge transition-colors ${
-                activeAccess === a
-                  ? "bg-primary-dark text-white"
-                  : "bg-white text-gray-600 border border-gray-200"
-              }`}
-            >
-              {accessFilterLabel[a]}
-            </button>
-          ))}
+        <div className="overflow-x-auto">
+          <SegmentedFilter
+            options={ACCESS_OPTIONS}
+            labels={accessFilterLabel}
+            active={activeAccess}
+            onChange={handleAccess}
+            pillColor="bg-primary-dark"
+            activeTextColor="text-white"
+          />
         </div>
       </div>
 
       {/* Use case filter */}
       <div className="px-4 pt-3">
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Filter by use case</p>
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {(["All", ...USE_CASES] as (UseCase | "All")[]).map((u) => (
-            <button
-              key={u}
-              onClick={() => setActiveUseCase(u)}
-              className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-badge transition-colors ${
-                activeUseCase === u
-                  ? "bg-warm text-primary-dark"
-                  : "bg-white text-gray-600 border border-gray-200"
-              }`}
-            >
-              {u}
-            </button>
-          ))}
+        <div className="overflow-x-auto pb-1">
+          <SegmentedFilter
+            options={USE_CASE_OPTIONS}
+            active={activeUseCase}
+            onChange={handleUseCase}
+            pillColor="bg-warm"
+            activeTextColor="text-primary-dark"
+          />
         </div>
       </div>
 
@@ -91,7 +156,7 @@ export default function ToolsPage() {
       </div>
 
       {/* Tool cards */}
-      <div className="px-4 flex flex-col gap-3 pb-4">
+      <div className={`px-4 flex flex-col gap-3 pb-4 filter-grid ${fading ? "fading" : ""}`}>
         {filtered.map((tool, index) => {
           const badge = accessBadge[tool.accessLevel];
           const BadgeIcon = badge.icon;
@@ -148,7 +213,7 @@ export default function ToolsPage() {
           <div className="text-center py-10 text-gray-400">
             <p className="text-sm font-medium">No tools match your filters</p>
             <button
-              onClick={() => { setActiveAccess("All"); setActiveUseCase("All"); }}
+              onClick={() => { handleAccess("All"); handleUseCase("All"); }}
               className="text-xs text-primary font-semibold mt-2"
             >
               Clear filters
@@ -156,7 +221,6 @@ export default function ToolsPage() {
           </div>
         )}
 
-        {/* Disclaimer */}
         <div className="mt-1 p-3 rounded-inner bg-warm/10 border border-warm/30">
           <p className="text-[10px] text-primary-dark leading-relaxed">
             <span className="font-bold">OPSEC reminder:</span> Never enter classified, CUI, or PII into commercial AI tools. Use NIPR-approved platforms for all sensitive work.

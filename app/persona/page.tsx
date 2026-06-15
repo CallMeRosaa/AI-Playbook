@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronRight, ChevronLeft, Copy, Check, Download, Sparkles, ExternalLink, CheckCircle2 } from "lucide-react";
+import { Fragment, useState } from "react";
+import {
+  ChevronRight, ChevronLeft, Copy, Check, Download,
+  Sparkles, ExternalLink, CheckCircle2,
+} from "lucide-react";
 import { getAfscProfile, COMMON_ADDITIONAL_DUTIES } from "@/lib/data/afsc-data";
 
-const RANKS = [
-  "AB", "Amn", "A1C", "SrA", "SSgt", "TSgt", "MSgt", "SMSgt", "CMSgt",
-  "2Lt", "1Lt", "Capt", "Maj", "Lt Col", "Col", "Brig Gen", "Maj Gen", "Lt Gen", "Gen",
-];
+const ENLISTED_RANKS = ["AB", "Amn", "A1C", "SrA", "SSgt", "TSgt", "MSgt", "SMSgt", "CMSgt"];
+const OFFICER_RANKS = ["2Lt", "1Lt", "Capt", "Maj", "Lt Col", "Col", "Brig Gen", "Maj Gen", "Lt Gen", "Gen"];
 
 const AI_STYLE_OPTIONS = [
   { label: "Short bullets — give me the bottom line", value: "Concise bullet points, no filler text" },
@@ -39,42 +40,134 @@ const initial: FormData = {
 };
 
 const STEPS = [
-  { label: "Identity", sublabel: "Who are you?" },
-  { label: "Your Day", sublabel: "What do you do?" },
-  { label: "The Grind", sublabel: "Where does your time go?" },
+  { label: "Identity",    sublabel: "Who are you?" },
+  { label: "Your Day",    sublabel: "What do you do?" },
+  { label: "The Grind",   sublabel: "Where does your time go?" },
   { label: "Duties & Refs", sublabel: "What else do you manage?" },
-  { label: "Your Style", sublabel: "How should AI talk to you?" },
+  { label: "Your Style",  sublabel: "How should AI talk to you?" },
 ];
 
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function Stepper({ current }: { current: number }) {
+  return (
+    <div className="px-5 pt-4 pb-3 bg-white border-b border-gray-100">
+      <div className="flex items-center">
+        {STEPS.map((_, i) => (
+          <Fragment key={i}>
+            <div
+              className={`
+                w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0
+                text-xs font-bold transition-all duration-250
+                ${i < current  ? "bg-primary text-white"
+                : i === current ? "bg-warm text-primary-dark"
+                :                 "bg-gray-100 text-gray-400"}
+              `}
+            >
+              {i < current ? <Check size={13} strokeWidth={2.5} /> : i + 1}
+            </div>
+            {i < STEPS.length - 1 && (
+              <div
+                className={`flex-1 h-px mx-1 transition-colors duration-400 ${
+                  i < current ? "bg-primary" : "bg-gray-200"
+                }`}
+              />
+            )}
+          </Fragment>
+        ))}
+      </div>
+      <div className="mt-2.5 flex items-baseline justify-between">
+        <span className="text-xs font-bold text-primary-dark">
+          {STEPS[current].label}
+          <span className="font-normal text-gray-400"> — {STEPS[current].sublabel}</span>
+        </span>
+        <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap ml-2">
+          {current + 1} / {STEPS.length}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function RankSelector({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const Group = ({ label, ranks }: { label: string; ranks: string[] }) => (
+    <div className="mb-3 last:mb-0">
+      <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">{label}</p>
+      <div className="flex flex-wrap gap-1.5">
+        {ranks.map((r) => (
+          <button
+            key={r}
+            type="button"
+            onClick={() => onChange(r)}
+            className={`text-xs font-bold px-3 py-1.5 rounded-badge border transition-all duration-150 ${
+              value === r
+                ? "bg-primary text-white border-primary"
+                : "bg-white text-gray-600 border-gray-200 hover:border-primary/40 hover:text-primary"
+            }`}
+          >
+            {r}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="bg-gray-50 rounded-inner p-3 border border-gray-100">
+      <Group label="Enlisted" ranks={ENLISTED_RANKS} />
+      <Group label="Officer"  ranks={OFFICER_RANKS}  />
+    </div>
+  );
+}
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5 block">
+      {children}
+    </label>
+  );
+}
+
+function Hint({ show, text }: { show: boolean; text: string }) {
+  if (!show) return null;
+  return (
+    <p className="text-[11px] text-caution font-semibold mt-1.5 flex items-center gap-1">
+      <span className="inline-block w-1 h-1 rounded-full bg-caution flex-shrink-0" />
+      {text}
+    </p>
+  );
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
+
 export default function PersonaPage() {
-  const [step, setStep] = useState(0);
-  const [form, setForm] = useState<FormData>(initial);
-  const [loading, setLoading] = useState(false);
-  const [persona, setPersona] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [step, setStep]           = useState(0);
+  const [direction, setDirection] = useState<"fwd" | "back">("fwd");
+  const [form, setForm]           = useState<FormData>(initial);
+  const [loading, setLoading]     = useState(false);
+  const [persona, setPersona]     = useState<string | null>(null);
+  const [copied, setCopied]       = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   const update = (field: keyof FormData, value: string) =>
     setForm((p) => ({ ...p, [field]: value }));
 
-  const toggleDuty = (id: string) => {
+  const toggleDuty = (id: string) =>
     setForm((p) => ({
       ...p,
       additionalDuties: p.additionalDuties.includes(id)
         ? p.additionalDuties.filter((d) => d !== id)
         : [...p.additionalDuties, id],
     }));
-  };
 
-  const appendTask = (task: string) => {
+  const appendTask = (task: string) =>
     setForm((p) => {
-      const current = p.dailyTasks.trim();
-      const newVal = current ? `${current}\n${task}` : task;
-      return { ...p, dailyTasks: newVal };
+      const cur = p.dailyTasks.trim();
+      return { ...p, dailyTasks: cur ? `${cur}\n${task}` : task };
     });
-  };
 
   const canAdvance = () => {
-    if (step === 0) return !!(form.rank && form.afsc && form.jobTitle.trim());
+    if (step === 0) return !!(form.rank && form.afsc.trim() && form.jobTitle.trim());
     if (step === 1) return form.dailyTasks.trim().length > 20;
     if (step === 2) return form.biggestGrind.trim().length > 10;
     if (step === 3) return true;
@@ -82,10 +175,23 @@ export default function PersonaPage() {
     return true;
   };
 
+  const goNext = () => {
+    if (!canAdvance()) { setAttempted(true); return; }
+    setAttempted(false);
+    setDirection("fwd");
+    setStep((s) => s + 1);
+  };
+
+  const goBack = () => {
+    setAttempted(false);
+    setDirection("back");
+    setStep((s) => s - 1);
+  };
+
   const handleGenerate = async () => {
+    if (!canAdvance()) { setAttempted(true); return; }
     setLoading(true);
     try {
-      // Resolve duty IDs to labels for the API
       const dutyLabels = form.additionalDuties.map(
         (id) => COMMON_ADDITIONAL_DUTIES.find((d) => d.id === id)?.label ?? id
       );
@@ -113,9 +219,9 @@ export default function PersonaPage() {
   const handleDownload = () => {
     if (!persona) return;
     const blob = new Blob([persona], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
     a.download = `${form.rank}_${form.afsc}_AI_Context.txt`;
     a.click();
     URL.revokeObjectURL(url);
@@ -125,36 +231,39 @@ export default function PersonaPage() {
     setPersona(null);
     setStep(0);
     setForm(initial);
+    setAttempted(false);
   };
 
   const openEpubs = () => {
-    const query = form.publications.trim();
-    const url = query
-      ? `https://www.e-publishing.af.mil/product-index/#/?view=search&keyword=${encodeURIComponent(query)}`
+    const q   = form.publications.trim();
+    const url = q
+      ? `https://www.e-publishing.af.mil/product-index/#/?view=search&keyword=${encodeURIComponent(q)}`
       : "https://www.e-publishing.af.mil";
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const afscProfile = getAfscProfile(form.afsc);
 
-  // Result screen
+  // ── Completion screen ──
   if (persona) {
     return (
       <div className="flex flex-col">
         <div className="bg-warm px-5 pt-8 pb-5">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles size={18} className="text-primary" />
-            <span className="text-xs font-bold uppercase tracking-wider text-primary">
-              Your AI Context File
-            </span>
+          <div className="flex items-center gap-3 mb-3">
+            <CheckCircle2 size={30} className="text-primary animate-check-pop flex-shrink-0" />
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
+                Context File Ready
+              </span>
+              <h1
+                className="text-xl font-black uppercase tracking-tight text-primary leading-tight"
+                style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
+              >
+                {form.rank} · {form.afsc}
+              </h1>
+            </div>
           </div>
-          <h1
-            className="text-2xl font-black uppercase tracking-tight text-primary leading-tight"
-            style={{ fontFamily: "'Arial Black', Arial, sans-serif" }}
-          >
-            {form.rank} · {form.afsc}
-          </h1>
-          <p className="text-sm text-primary-dark/80 mt-1">
+          <p className="text-sm text-primary-dark/80">
             Paste this into any AI tool before your first message.
           </p>
         </div>
@@ -170,21 +279,29 @@ export default function PersonaPage() {
 
           <button
             onClick={handleCopy}
-            className={`w-full flex items-center justify-center gap-2 py-3 rounded-inner text-sm font-bold transition-all ${
-              copied ? "bg-green-500 text-white" : "bg-primary text-white"
+            className={`w-full flex items-center justify-center gap-2 py-3 rounded-inner text-sm font-bold transition-all duration-250 ${
+              copied
+                ? "bg-success text-white"
+                : "bg-primary text-white active:bg-primary-dark"
             }`}
           >
-            {copied ? <><Check size={16} /> Copied!</> : <><Copy size={16} /> Copy to Clipboard</>}
+            {copied
+              ? <><Check size={16} /> Copied to clipboard</>
+              : <><Copy size={16} /> Copy to Clipboard</>
+            }
           </button>
 
           <button
             onClick={handleDownload}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-inner text-sm font-bold bg-white border border-gray-200 text-primary"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-inner text-sm font-bold bg-white border border-gray-200 text-primary active:bg-gray-50 transition-colors"
           >
             <Download size={16} /> Download as .txt
           </button>
 
-          <button onClick={handleReset} className="text-xs text-gray-400 font-medium text-center py-2">
+          <button
+            onClick={handleReset}
+            className="text-xs text-gray-400 font-medium text-center py-2 hover:text-gray-600 transition-colors"
+          >
             Start over
           </button>
 
@@ -201,11 +318,14 @@ export default function PersonaPage() {
     );
   }
 
+  // ── Wizard ──
+  const animClass = direction === "fwd" ? "step-enter-fwd" : "step-enter-back";
+
   return (
     <div className="flex flex-col">
       {/* Header */}
       <div className="bg-warm px-5 pt-8 pb-5">
-        <span className="text-xs font-bold uppercase tracking-wider text-primary">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
           Persona Builder
         </span>
         <h1
@@ -217,74 +337,59 @@ export default function PersonaPage() {
         <p className="text-sm text-primary-dark/70 mt-0.5">{STEPS[step].sublabel}</p>
       </div>
 
-      {/* Progress bar */}
-      <div className="bg-primary px-4 py-2.5 flex items-center gap-3">
-        <div className="flex gap-1 flex-1">
-          {STEPS.map((_, i) => (
-            <div
-              key={i}
-              className={`h-1 flex-1 rounded-badge transition-colors ${
-                i <= step ? "bg-warm" : "bg-white/20"
-              }`}
-            />
-          ))}
-        </div>
-        <span className="text-[11px] text-blue-300 font-medium whitespace-nowrap">
-          {step + 1} / {STEPS.length}
-        </span>
-      </div>
+      {/* Stepper */}
+      <Stepper current={step} />
 
-      <div className="px-4 pt-6 flex flex-col gap-5 pb-6">
+      {/* Step content — key forces remount on each step change, triggering slide animation */}
+      <div key={step} className={`px-4 pt-6 flex flex-col gap-5 pb-6 ${animClass}`}>
 
-        {/* Step 0 — Identity */}
+        {/* ── Step 0: Identity ── */}
         {step === 0 && (
           <>
             <p className="text-base font-semibold text-primary-dark leading-snug">
               What&apos;s your rank, AFSC, and what do people call your job?
             </p>
-            <div className="flex flex-col gap-3">
+
+            <div className="flex flex-col gap-4">
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5 block">Rank</label>
-                <select
-                  value={form.rank}
-                  onChange={(e) => update("rank", e.target.value)}
-                  className="w-full border border-gray-200 rounded-input px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
-                >
-                  <option value="">Select rank...</option>
-                  {RANKS.map((r) => <option key={r} value={r}>{r}</option>)}
-                </select>
+                <FieldLabel>Rank</FieldLabel>
+                <RankSelector value={form.rank} onChange={(v) => update("rank", v)} />
+                <Hint show={attempted && !form.rank} text="Select your rank to continue" />
               </div>
+
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5 block">AFSC</label>
+                <FieldLabel>AFSC</FieldLabel>
                 <input
                   type="text"
                   placeholder="e.g. 3D1X1"
                   value={form.afsc}
                   onChange={(e) => update("afsc", e.target.value)}
-                  className="w-full border border-gray-200 rounded-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full border border-gray-200 rounded-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                 />
+                <Hint show={attempted && !form.afsc.trim()} text="Enter your AFSC (e.g., 3D1X1)" />
               </div>
+
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5 block">
-                  Job Title / What You Actually Do
-                </label>
+                <FieldLabel>Job Title / What You Actually Do</FieldLabel>
                 <input
                   type="text"
                   placeholder="e.g. Network Admin, Crew Chief, Training NCO"
                   value={form.jobTitle}
                   onChange={(e) => update("jobTitle", e.target.value)}
-                  className="w-full border border-gray-200 rounded-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full border border-gray-200 rounded-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                 />
+                <Hint show={attempted && !form.jobTitle.trim()} text="Enter your job title" />
               </div>
             </div>
           </>
         )}
 
-        {/* Step 1 — Daily Tasks */}
+        {/* ── Step 1: Daily Tasks ── */}
         {step === 1 && (
           <>
             <p className="text-base font-semibold text-primary-dark leading-snug">
-              Walk me through your average duty day. What are the first things you actually <em>do</em> when you sit down?
+              Walk me through your average duty day. What are the first things you actually{" "}
+              <em>do</em> when you sit down?
             </p>
             <p className="text-xs text-gray-400 -mt-2">
               Don&apos;t overthink it — just describe what you do, in order.
@@ -294,10 +399,13 @@ export default function PersonaPage() {
               placeholder="e.g. Check AROWS for leave requests, pull the maintenance schedule, triage about 30 emails before 0900, then brief the flight chief on overnight issues..."
               value={form.dailyTasks}
               onChange={(e) => update("dailyTasks", e.target.value)}
-              className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none leading-relaxed"
+              className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none leading-relaxed transition-colors"
+            />
+            <Hint
+              show={attempted && form.dailyTasks.trim().length <= 20}
+              text="Add a bit more detail — describe what you actually do day to day"
             />
 
-            {/* AFSC-based task suggestions */}
             {afscProfile && (
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
@@ -332,7 +440,7 @@ export default function PersonaPage() {
           </>
         )}
 
-        {/* Step 2 — Biggest Grind */}
+        {/* ── Step 2: Biggest Grind ── */}
         {step === 2 && (
           <>
             <p className="text-base font-semibold text-primary-dark leading-snug">
@@ -346,45 +454,43 @@ export default function PersonaPage() {
               placeholder="e.g. Writing EPR bullets at the end of every quarter takes me 3-4 hours per person, and I always stare at a blank page for the first hour..."
               value={form.biggestGrind}
               onChange={(e) => update("biggestGrind", e.target.value)}
-              className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none leading-relaxed"
+              className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none leading-relaxed transition-colors"
+            />
+            <Hint
+              show={attempted && form.biggestGrind.trim().length <= 10}
+              text="Tell us a bit more — what specific task eats your time?"
             />
           </>
         )}
 
-        {/* Step 3 — Duties & References */}
+        {/* ── Step 3: Duties & References ── */}
         {step === 3 && (
           <>
             <p className="text-base font-semibold text-primary-dark leading-snug">
               What AFIs or TOs do you work from — and what additional programs do you manage?
             </p>
 
-            {/* Publications */}
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5 block">
-                Key Publications (optional)
-              </label>
+              <FieldLabel>Key Publications (optional)</FieldLabel>
               <textarea
                 rows={3}
                 placeholder="e.g. AFI 36-2406, T.O. 00-20-1, AFMAN 33-363..."
                 value={form.publications}
                 onChange={(e) => update("publications", e.target.value)}
-                className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none leading-relaxed"
+                className="w-full border border-gray-200 rounded-input px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none leading-relaxed transition-colors"
               />
               <button
                 onClick={openEpubs}
-                className="mt-2 flex items-center justify-center gap-2 w-full py-2.5 rounded-inner border border-primary text-primary text-xs font-bold bg-white"
+                className="mt-2 flex items-center justify-center gap-2 w-full py-2.5 rounded-inner border border-primary text-primary text-xs font-bold bg-white active:bg-primary/5 transition-colors"
               >
                 <ExternalLink size={13} />
                 Search AF e-Publishing (EPUBS)
               </button>
             </div>
 
-            {/* Additional Duties */}
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1 block">
-                Additional Programs You Manage (select all that apply)
-              </label>
-              <p className="text-[10px] text-gray-400 mb-3">
+              <FieldLabel>Additional Programs You Manage</FieldLabel>
+              <p className="text-[10px] text-gray-400 mb-3 -mt-1">
                 These get included in your AI context file so the AI knows your full workload.
               </p>
               <div className="flex flex-wrap gap-2">
@@ -417,7 +523,7 @@ export default function PersonaPage() {
           </>
         )}
 
-        {/* Step 4 — AI Style */}
+        {/* ── Step 4: AI Style ── */}
         {step === 4 && (
           <>
             <p className="text-base font-semibold text-primary-dark leading-snug">
@@ -428,37 +534,38 @@ export default function PersonaPage() {
                 <button
                   key={opt.value}
                   onClick={() => update("aiStyle", opt.value)}
-                  className={`text-left text-sm font-medium px-4 py-3.5 rounded-inner border transition-colors ${
+                  className={`text-left text-sm font-medium px-4 py-3.5 rounded-inner border transition-all duration-150 ${
                     form.aiStyle === opt.value
                       ? "bg-primary text-white border-primary"
-                      : "bg-white text-gray-700 border-gray-200"
+                      : "bg-white text-gray-700 border-gray-200 hover:border-primary/30"
                   }`}
                 >
                   {opt.label}
                 </button>
               ))}
             </div>
+            <Hint show={attempted && !form.aiStyle} text="Select your preferred response style" />
           </>
         )}
 
-        {/* Navigation */}
+        {/* ── Navigation ── */}
         <div className="flex gap-3 pt-1">
           {step > 0 && (
             <button
-              onClick={() => setStep((s) => s - 1)}
-              className="flex items-center gap-1 px-4 py-3 rounded-inner border border-gray-200 bg-white text-sm font-semibold text-gray-600"
+              onClick={goBack}
+              className="flex items-center gap-1 px-4 py-3 rounded-inner border border-gray-200 bg-white text-sm font-semibold text-gray-600 active:bg-gray-50 transition-colors"
             >
               <ChevronLeft size={16} /> Back
             </button>
           )}
+
           {step < STEPS.length - 1 ? (
             <button
-              onClick={() => setStep((s) => s + 1)}
-              disabled={!canAdvance()}
-              className={`flex-1 flex items-center justify-center gap-1 py-3 rounded-inner text-sm font-bold transition-all ${
+              onClick={goNext}
+              className={`flex-1 flex items-center justify-center gap-1 py-3 rounded-inner text-sm font-bold transition-all duration-150 ${
                 canAdvance()
-                  ? "bg-primary text-white"
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  ? "bg-primary text-white active:bg-primary-dark"
+                  : "bg-gray-100 text-gray-400"
               }`}
             >
               Next <ChevronRight size={16} />
@@ -466,11 +573,13 @@ export default function PersonaPage() {
           ) : (
             <button
               onClick={handleGenerate}
-              disabled={loading || !canAdvance()}
+              disabled={loading}
               className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-inner text-sm font-bold transition-all ${
-                loading || !canAdvance()
+                loading
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-warm text-primary"
+                  : canAdvance()
+                  ? "bg-warm text-primary-dark active:bg-warm-dark"
+                  : "bg-gray-100 text-gray-400"
               }`}
             >
               {loading ? (

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useLayoutEffect, useCallback } from "react";
 import { Search, Copy, Check, Clock, ChevronDown, ChevronUp, ShieldAlert } from "lucide-react";
 import { PROMPTS, CATEGORIES, type PromptCategory } from "@/lib/mock/prompts";
 
-// Badge: pill behind the category name
 const categoryColors: Record<PromptCategory, string> = {
   Admin:      "bg-blue-100 text-blue-700",
   Comms:      "bg-purple-100 text-purple-700",
@@ -14,7 +13,6 @@ const categoryColors: Record<PromptCategory, string> = {
   Intel:      "bg-red-100 text-red-700",
 };
 
-// Accent bar: 3 px top stripe that gives each category a distinct color lane
 const categoryAccent: Record<PromptCategory, string> = {
   Admin:      "bg-primary",
   Comms:      "bg-purple-500",
@@ -24,19 +22,93 @@ const categoryAccent: Record<PromptCategory, string> = {
   Intel:      "bg-danger",
 };
 
+const ALL_CATS = ["All", ...CATEGORIES] as (PromptCategory | "All")[];
+
+function SegmentedFilter({
+  options,
+  active,
+  onChange,
+  pillColor = "bg-primary",
+  activeTextColor = "text-white",
+}: {
+  options: string[];
+  active: string;
+  onChange: (v: string) => void;
+  pillColor?: string;
+  activeTextColor?: string;
+}) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [pill, setPill] = useState({ left: 0, width: 0 });
+
+  const updatePill = useCallback(() => {
+    const idx = options.indexOf(active);
+    const btn = btnRefs.current[idx];
+    const track = trackRef.current;
+    if (!btn || !track) return;
+    const trackRect = track.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    setPill({ left: btnRect.left - trackRect.left, width: btnRect.width });
+  }, [active, options]);
+
+  useLayoutEffect(() => { updatePill(); }, [updatePill]);
+
+  return (
+    <div ref={trackRef} className="seg-track">
+      <div
+        className={`seg-pill ${pillColor}`}
+        style={{ left: pill.left, width: pill.width }}
+      />
+      {options.map((opt, i) => (
+        <button
+          key={opt}
+          ref={el => { btnRefs.current[i] = el; }}
+          onClick={() => onChange(opt)}
+          className={`seg-btn ${active === opt ? activeTextColor : "text-gray-500"}`}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function PromptsPage() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<PromptCategory | "All">("All");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [fading, setFading] = useState(false);
+  const [displayCategory, setDisplayCategory] = useState<PromptCategory | "All">("All");
+  const [displaySearch, setDisplaySearch] = useState("");
+
+  const applyFilter = useCallback((cat: PromptCategory | "All", srch: string) => {
+    setFading(true);
+    setTimeout(() => {
+      setDisplayCategory(cat);
+      setDisplaySearch(srch);
+      setFading(false);
+    }, 130);
+  }, []);
+
+  const handleCategory = (cat: string) => {
+    const c = cat as PromptCategory | "All";
+    setActiveCategory(c);
+    applyFilter(c, search);
+  };
+
+  const handleSearch = (s: string) => {
+    setSearch(s);
+    applyFilter(activeCategory, s);
+  };
 
   const filtered = PROMPTS.filter((p) => {
-    const matchesCategory = activeCategory === "All" || p.category === activeCategory;
+    const matchesCategory = displayCategory === "All" || p.category === displayCategory;
     const matchesSearch =
-      search.trim() === "" ||
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      p.description.toLowerCase().includes(search.toLowerCase()) ||
-      p.category.toLowerCase().includes(search.toLowerCase());
+      displaySearch.trim() === "" ||
+      p.title.toLowerCase().includes(displaySearch.toLowerCase()) ||
+      p.description.toLowerCase().includes(displaySearch.toLowerCase()) ||
+      p.category.toLowerCase().includes(displaySearch.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -72,39 +144,33 @@ export default function PromptsPage() {
             type="text"
             placeholder="Search prompts..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2.5 rounded-input border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
           />
         </div>
       </div>
 
-      {/* Category filter */}
-      <div className="px-4 pt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        {(["All", ...CATEGORIES] as (PromptCategory | "All")[]).map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-badge transition-colors ${
-              activeCategory === cat
-                ? "bg-primary text-white"
-                : "bg-white text-gray-600 border border-gray-200"
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
+      {/* Category filter — segmented control */}
+      <div className="px-4 pt-3 overflow-x-auto pb-1">
+        <SegmentedFilter
+          options={ALL_CATS}
+          active={activeCategory}
+          onChange={handleCategory}
+          pillColor="bg-primary"
+          activeTextColor="text-white"
+        />
       </div>
 
       {/* Results count */}
       <div className="px-4 pt-3 pb-1">
         <p className="text-xs text-gray-500 font-medium">
           {filtered.length} prompt{filtered.length !== 1 ? "s" : ""}
-          {activeCategory !== "All" ? ` in ${activeCategory}` : ""}
+          {displayCategory !== "All" ? ` in ${displayCategory}` : ""}
         </p>
       </div>
 
       {/* Prompt cards */}
-      <div className="px-4 flex flex-col gap-3 pb-4">
+      <div className={`px-4 flex flex-col gap-3 pb-4 filter-grid ${fading ? "fading" : ""}`}>
         {filtered.map((prompt, index) => {
           const isExpanded = expandedId === prompt.id;
           const isCopied = copiedId === prompt.id;
@@ -114,10 +180,8 @@ export default function PromptsPage() {
               className="animate-fade-up bg-white rounded-card shadow-resting border border-gray-100 hover:shadow-hover hover:border-primary/20 overflow-hidden transition-all duration-base ease-smooth"
               style={{ animationDelay: `${Math.min(index * 40, 240)}ms` }}
             >
-              {/* Category accent bar */}
               <div className={`h-[3px] w-full ${categoryAccent[prompt.category]}`} />
 
-              {/* Card header */}
               <button
                 onClick={() => setExpandedId(isExpanded ? null : prompt.id)}
                 className="w-full text-left p-5"
@@ -125,16 +189,13 @@ export default function PromptsPage() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                      {/* Category badge */}
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-badge ${categoryColors[prompt.category]}`}>
                         {prompt.category}
                       </span>
-                      {/* Time saved pill */}
                       <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-badge bg-gray-100 text-gray-500">
                         <Clock size={9} />
                         {prompt.timeSaved}
                       </span>
-                      {/* Sensitive / CUI flag */}
                       {prompt.sensitive && (
                         <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-badge bg-caution-tint text-caution-mid">
                           <ShieldAlert size={10} />
@@ -151,7 +212,6 @@ export default function PromptsPage() {
                 </div>
               </button>
 
-              {/* Expanded prompt */}
               {isExpanded && (
                 <div className="px-5 pb-5 border-t border-gray-100">
                   <div className="mt-3 bg-background rounded-inner p-3 relative">
@@ -174,13 +234,9 @@ export default function PromptsPage() {
                     }`}
                   >
                     {isCopied ? (
-                      <>
-                        <Check size={15} /> Copied to clipboard
-                      </>
+                      <><Check size={15} /> Copied to clipboard</>
                     ) : (
-                      <>
-                        <Copy size={15} /> Copy Prompt
-                      </>
+                      <><Copy size={15} /> Copy Prompt</>
                     )}
                   </button>
                 </div>
