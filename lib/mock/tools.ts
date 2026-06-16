@@ -27,18 +27,6 @@ export const TOOLS: Tool[] = [
     icon: "🛡️",
   },
   {
-    id: "t2",
-    name: "NIPRGPT",
-    tagline: "Unclassified GPT for AF Personnel",
-    description:
-      "A government-hosted ChatGPT-style interface approved for NIPR use. Good for drafting documents, summarizing regulations, and answering technical questions without sending data to commercial cloud.",
-    accessLevel: "NIPR",
-    useCases: ["Writing", "Research"],
-    url: "https://niprgpt.mil",
-    badge: "Gov Hosted",
-    icon: "🤖",
-  },
-  {
     id: "t3",
     name: "Microsoft Copilot (M365)",
     tagline: "AI Built Into Your Office Suite",

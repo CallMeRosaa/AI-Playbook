@@ -312,7 +312,7 @@ export default function PersonaPage() {
             <p className="text-xs text-primary-dark font-semibold mb-1">How to use this</p>
             <p className="text-xs text-gray-600 leading-relaxed">
               Paste this entire file into the first message of any AI session —
-              GenAI.mil, NIPRGPT, Claude, or ChatGPT. The AI will immediately
+              GenAI.mil, Claude, or ChatGPT. The AI will immediately
               know your role and how to help you.
             </p>
           </div>
