@@ -22,7 +22,7 @@ export const TOOLS: Tool[] = [
       "The Department of the Air Force's official generative AI platform for unclassified use on NIPR. Powered by commercial LLMs, approved for government sensitive work. Start here for all official AI tasks.",
     accessLevel: "NIPR",
     useCases: ["Writing", "Research", "Briefings"],
-    url: "https://genai.af.mil",
+    url: "https://genai.mil",
     badge: "DAF Official",
     icon: "🛡️",
   },
@@ -37,17 +37,6 @@ export const TOOLS: Tool[] = [
     url: "https://copilot.microsoft.com",
     badge: "M365 Integrated",
     icon: "💼",
-  },
-  {
-    id: "t4",
-    name: "Claude (Anthropic)",
-    tagline: "Advanced Reasoning & Long Documents",
-    description:
-      "Excellent for complex analysis, summarizing long documents, and nuanced writing tasks. Claude handles 200K+ token context windows — paste in entire regulations, manuals, or reports for analysis. For unclassified/personal use only.",
-    accessLevel: "Commercial",
-    useCases: ["Writing", "Research", "Briefings"],
-    url: "https://claude.ai",
-    icon: "🧠",
   },
   {
     id: "t5",
@@ -76,7 +65,7 @@ export const TOOLS: Tool[] = [
     name: "Adobe Firefly",
     tagline: "Professional AI Image Generation",
     description:
-      "Adobe's AI image generator, trained on licensed content — making it safer for official use than some alternatives. Create illustrations, edit photos, and generate graphics for publications and outreach.",
+      "Adobe's AI image generator, trained on licensed content, which makes it safer for official use than some alternatives. Create illustrations, edit photos, and generate graphics for publications and outreach.",
     accessLevel: "Commercial",
     useCases: ["Images"],
     url: "https://firefly.adobe.com",
@@ -120,7 +109,7 @@ export const TOOLS: Tool[] = [
     name: "Grammarly",
     tagline: "AI Writing Assistant",
     description:
-      "Goes beyond spellcheck — Grammarly analyzes tone, clarity, and formality. The 'Formal' mode helps ensure emails, memos, and reports meet professional military writing standards.",
+      "Goes beyond spellcheck. Grammarly analyzes tone, clarity, and formality. The 'Formal' mode helps ensure emails, memos, and reports meet professional military writing standards.",
     accessLevel: "Commercial",
     useCases: ["Writing"],
     url: "https://grammarly.com",

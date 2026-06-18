@@ -17,7 +17,7 @@ const barlowCondensed = Barlow_Condensed({
 
 export const metadata: Metadata = {
   title: "Airman's Playbook",
-  description: "Empowering every Airman to reclaim hours through AI — official prompts, tools, and your personal AI context file.",
+  description: "The IL2 front door to the Airman's Playbook. Pick your job, get the safe starting move, and go run it on GenAI.mil.",
   manifest: "/manifest.json",
 };
 
@@ -38,7 +38,7 @@ export default function RootLayout({
       <body className="min-h-full bg-background text-foreground font-[family-name:var(--font-public-sans)]">
         <div className="max-w-lg mx-auto min-h-screen relative">
           <div className="bg-warm text-primary-dark text-center text-[10px] font-bold uppercase tracking-widest py-1.5 px-4">
-            🚧 Beta — Content and features are actively being developed
+            Concept demonstration. Plays are examples, verify before official use.
           </div>
           <main className="page-content">{children}</main>
           <BottomNav />

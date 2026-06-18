@@ -5,9 +5,9 @@ import { ExternalLink, Shield, Wifi, Globe } from "lucide-react";
 import { TOOLS, USE_CASES, type AccessLevel, type UseCase } from "@/lib/mock/tools";
 
 const accessBadge: Record<AccessLevel, { label: string; color: string; icon: typeof Shield }> = {
-  NIPR:       { label: "Approved – Official Use (NIPR)",   color: "bg-success-tint text-success-mid", icon: Shield },
-  Commercial: { label: "Personal Use Only – Unclassified", color: "bg-caution-tint text-caution-mid", icon: Globe  },
-  Both:       { label: "Official + Personal",              color: "bg-primary-tint text-primary",      icon: Wifi   },
+  NIPR:       { label: "Commonly approved for official use, verify locally", color: "bg-success-tint text-success-mid", icon: Shield },
+  Commercial: { label: "Personal use only, unclassified",                    color: "bg-caution-tint text-caution-mid", icon: Globe  },
+  Both:       { label: "Official and personal use",                          color: "bg-primary-tint text-primary",      icon: Wifi   },
 };
 
 const accessFilterLabel: Record<AccessLevel | "All", string> = {
@@ -114,10 +114,10 @@ export default function ToolsPage() {
           <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
         </div>
         <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">
-          AI Tool Catalog
+          AI Tools
         </h1>
         <p className="text-sm text-on-dark">
-          Know what&apos;s available, what it does, and when to use it.
+          Start at GenAI.mil for official, unclassified work. The rest is context.
         </p>
       </div>
 
