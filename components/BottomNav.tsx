@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Home, BookOpen, Wrench, User } from "lucide-react";
+import { Home, Layers, Wrench, Compass } from "lucide-react";
 
 const tabs = [
   { href: "/", label: "Home", icon: Home },
-  { href: "/prompts", label: "Prompts", icon: BookOpen },
+  { href: "/plays", label: "Plays", icon: Layers },
   { href: "/tools", label: "Tools", icon: Wrench },
-  { href: "/persona", label: "My Persona", icon: User },
+  { href: "/guide", label: "Guide", icon: Compass },
 ];
 
 export default function BottomNav() {
