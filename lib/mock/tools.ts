@@ -11,6 +11,7 @@ export interface Tool {
   url: string;
   badge?: string;
   icon: string;
+  inDevelopment?: boolean;
 }
 
 export const TOOLS: Tool[] = [
@@ -137,6 +138,19 @@ export const TOOLS: Tool[] = [
     useCases: ["Video", "Images"],
     url: "https://runwayml.com",
     icon: "🎬",
+  },
+  {
+    id: "t14",
+    name: "Envision",
+    tagline: "Advanced DAF Data & AI Platform",
+    description:
+      "An advanced Department of the Air Force data and AI platform for deeper analytics and model-driven work. It is still rolling out, so access is limited and onboarding is by unit. Treat it as an advanced step beyond GenAI.mil once it is available to you.",
+    accessLevel: "NIPR",
+    useCases: ["Data", "Research"],
+    url: "",
+    badge: "In Development",
+    icon: "🔭",
+    inDevelopment: true,
   },
 ];
 

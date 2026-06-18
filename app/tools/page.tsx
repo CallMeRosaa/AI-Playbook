@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useLayoutEffect, useCallback } from "react";
-import { ExternalLink, Shield, Wifi, Globe } from "lucide-react";
+import { ExternalLink, Shield, Wifi, Globe, Clock } from "lucide-react";
 import { TOOLS, USE_CASES, type AccessLevel, type UseCase } from "@/lib/mock/tools";
 
 const accessBadge: Record<AccessLevel, { label: string; color: string; icon: typeof Shield }> = {
@@ -184,15 +184,25 @@ export default function ToolsPage() {
                     <p className="text-[11px] text-primary font-semibold">{tool.tagline}</p>
                   </div>
                 </div>
-                <a
-                  href={tool.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-shrink-0 p-2 rounded-inner bg-background text-primary hover:bg-primary hover:text-white transition-colors"
-                  aria-label={`Open ${tool.name}`}
-                >
-                  <ExternalLink size={15} />
-                </a>
+                {tool.inDevelopment || !tool.url ? (
+                  <span
+                    className="flex-shrink-0 p-2 rounded-inner bg-gray-100 text-gray-400 cursor-not-allowed"
+                    aria-label={`${tool.name} is in development`}
+                    title="In development"
+                  >
+                    <Clock size={15} />
+                  </span>
+                ) : (
+                  <a
+                    href={tool.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-shrink-0 p-2 rounded-inner bg-background text-primary hover:bg-primary hover:text-white transition-colors"
+                    aria-label={`Open ${tool.name}`}
+                  >
+                    <ExternalLink size={15} />
+                  </a>
+                )}
               </div>
 
               <p className="text-xs text-gray-600 mt-2 leading-relaxed">{tool.description}</p>

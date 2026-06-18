@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Home, Layers, Wrench, Compass } from "lucide-react";
+import { Home, GraduationCap, Layers, Wrench, Compass } from "lucide-react";
 
 const tabs = [
   { href: "/", label: "Home", icon: Home },
+  { href: "/ai-101", label: "AI 101", icon: GraduationCap },
   { href: "/plays", label: "Plays", icon: Layers },
   { href: "/tools", label: "Tools", icon: Wrench },
   { href: "/guide", label: "Guide", icon: Compass },
