@@ -25,16 +25,34 @@ export interface StarredItem {
 
 // ─── Starred items ────────────────────────────────────────────────────────────
 
+// Stable empty reference shared by the server snapshot and the empty-storage case.
+const EMPTY_ITEMS: StarredItem[] = [];
+
+// useSyncExternalStore compares snapshots by reference (Object.is). readStarred is
+// the client getSnapshot, so it MUST return the same reference while the data is
+// unchanged — otherwise every render yields a fresh array, React sees a "change"
+// each time, and re-renders forever ("Maximum update depth exceeded"). We cache the
+// parsed result keyed on the raw localStorage string and only rebuild when it changes.
+let starredCacheRaw: string | null | undefined;
+let starredCache: StarredItem[] = EMPTY_ITEMS;
+
 function readStarred(): StarredItem[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return EMPTY_ITEMS;
+  let raw: string | null;
   try {
-    const raw = window.localStorage.getItem(STARRED_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as StarredItem[]) : [];
+    raw = window.localStorage.getItem(STARRED_KEY);
   } catch {
-    return [];
+    return EMPTY_ITEMS;
   }
+  if (raw === starredCacheRaw) return starredCache;
+  starredCacheRaw = raw;
+  try {
+    const parsed = raw ? JSON.parse(raw) : null;
+    starredCache = Array.isArray(parsed) && parsed.length > 0 ? (parsed as StarredItem[]) : EMPTY_ITEMS;
+  } catch {
+    starredCache = EMPTY_ITEMS;
+  }
+  return starredCache;
 }
 
 function writeStarred(items: StarredItem[]): void {
@@ -99,8 +117,6 @@ function makeSubscribe(event: string) {
 
 const subscribeStarred = makeSubscribe(STARRED_EVENT);
 const subscribePlaysRun = makeSubscribe(PLAYS_RUN_EVENT);
-
-const EMPTY_ITEMS: StarredItem[] = [];
 
 // Live-updating favorites. Server snapshot is a stable empty array so static
 // prerender and the first client paint agree.
