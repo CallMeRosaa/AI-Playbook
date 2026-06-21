@@ -12,6 +12,10 @@ export interface Tool {
   badge?: string;
   icon: string;
   inDevelopment?: boolean;
+  // Can an Airman reach this directly from a personal phone browser?
+  //   true  → render a direct link button.
+  //   false → desktop / NIPR only → render a "Send to me" button (Inc 2 relay stub).
+  accessibleMobile: boolean;
 }
 
 export const TOOLS: Tool[] = [
@@ -26,6 +30,35 @@ export const TOOLS: Tool[] = [
     url: "https://genai.mil",
     badge: "DAF Official",
     icon: "🛡️",
+    accessibleMobile: false,
+  },
+  // TODO(user): confirm Ask Sage URL, access level, and mobile accessibility.
+  {
+    id: "t15",
+    name: "Ask Sage",
+    tagline: "Government-Focused Generative AI",
+    description:
+      "A generative AI platform built for government and defense workflows, with access to multiple models in one place. Approved environments vary by unit — confirm your local guidance before official use.",
+    accessLevel: "NIPR",
+    useCases: ["Writing", "Research", "Data"],
+    url: "",
+    badge: "Verify locally",
+    icon: "🧭",
+    accessibleMobile: false,
+  },
+  // TODO(user): confirm OpenAFI access level (outbound link card).
+  {
+    id: "t16",
+    name: "OpenAFI",
+    tagline: "AI Help for Air Force Instructions",
+    description:
+      "An outbound resource for navigating and understanding Air Force Instructions with AI assistance. Always verify against the current certified publication on AF e-Publishing before citing in official work.",
+    accessLevel: "Both",
+    useCases: ["Research"],
+    url: "https://openafi.com/chat",
+    badge: "Outbound",
+    icon: "📖",
+    accessibleMobile: true,
   },
   {
     id: "t3",
@@ -38,6 +71,7 @@ export const TOOLS: Tool[] = [
     url: "https://copilot.microsoft.com",
     badge: "M365 Integrated",
     icon: "💼",
+    accessibleMobile: false,
   },
   {
     id: "t5",
@@ -49,6 +83,7 @@ export const TOOLS: Tool[] = [
     useCases: ["Writing", "Research", "Code"],
     url: "https://chatgpt.com",
     icon: "💬",
+    accessibleMobile: true,
   },
   {
     id: "t6",
@@ -60,6 +95,7 @@ export const TOOLS: Tool[] = [
     useCases: ["Images", "Briefings"],
     url: "https://designer.microsoft.com",
     icon: "🎨",
+    accessibleMobile: false,
   },
   {
     id: "t7",
@@ -71,6 +107,7 @@ export const TOOLS: Tool[] = [
     useCases: ["Images"],
     url: "https://firefly.adobe.com",
     icon: "🔥",
+    accessibleMobile: true,
   },
   {
     id: "t8",
@@ -82,6 +119,7 @@ export const TOOLS: Tool[] = [
     useCases: ["Code"],
     url: "https://github.com/features/copilot",
     icon: "⌨️",
+    accessibleMobile: false,
   },
   {
     id: "t9",
@@ -93,6 +131,7 @@ export const TOOLS: Tool[] = [
     useCases: ["Transcription"],
     url: "https://otter.ai",
     icon: "🎙️",
+    accessibleMobile: true,
   },
   {
     id: "t10",
@@ -104,6 +143,7 @@ export const TOOLS: Tool[] = [
     useCases: ["Research"],
     url: "https://perplexity.ai",
     icon: "🔍",
+    accessibleMobile: true,
   },
   {
     id: "t11",
@@ -115,6 +155,7 @@ export const TOOLS: Tool[] = [
     useCases: ["Writing"],
     url: "https://grammarly.com",
     icon: "✏️",
+    accessibleMobile: true,
   },
   {
     id: "t13",
@@ -127,6 +168,7 @@ export const TOOLS: Tool[] = [
     url: "https://www.e-publishing.af.mil",
     badge: "Official AF",
     icon: "📋",
+    accessibleMobile: true,
   },
   {
     id: "t12",
@@ -138,6 +180,7 @@ export const TOOLS: Tool[] = [
     useCases: ["Video", "Images"],
     url: "https://runwayml.com",
     icon: "🎬",
+    accessibleMobile: true,
   },
   {
     id: "t14",
@@ -151,6 +194,7 @@ export const TOOLS: Tool[] = [
     badge: "In Development",
     icon: "🔭",
     inDevelopment: true,
+    accessibleMobile: false,
   },
 ];
 

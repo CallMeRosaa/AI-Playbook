@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Public_Sans, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
+import AppChrome from "@/components/AppChrome";
 
 const publicSans = Public_Sans({
   subsets: ["latin"],
@@ -17,14 +18,13 @@ const barlowCondensed = Barlow_Condensed({
 
 export const metadata: Metadata = {
   title: "Airman's Playbook",
-  description: "The IL2 front door to the Airman's Playbook. Pick your job, get the safe starting move, and go run it on GenAI.mil.",
+  description: "Pick your job, get the safe starting move, and go run it on GenAI.mil.",
   manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   themeColor: "#003087",
 };
 
@@ -40,6 +40,7 @@ export default function RootLayout({
           <div className="bg-warm text-primary-dark text-center text-[10px] font-bold uppercase tracking-widest py-1.5 px-4">
             Concept demonstration. Plays are examples, verify before official use.
           </div>
+          <AppChrome />
           <main className="page-content">{children}</main>
           <BottomNav />
         </div>

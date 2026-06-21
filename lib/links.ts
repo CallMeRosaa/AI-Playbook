@@ -21,3 +21,9 @@ export const SURFACES: Record<"agent" | "notebook" | "pdf" | "genaimil", Surface
   pdf:      { label: "Open the Playbook PDF",       url: "", status: "pending" },
   genaimil: { label: "Open GenAI.mil",              url: "https://genai.mil", status: "live" },
 };
+
+// ─── SME contribution door ────────────────────────────────────────────────────
+// Google Form where Airmen propose new plays. Created separately from this build.
+// Fill in the live URL before deploy; while empty, the CTA renders as a disabled
+// "coming soon" rather than a dead link.
+export const SUGGEST_PLAY_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScr7E4hN_d1Sl31BnK1zFW5F3kwiT-rSfvODVpnbGEf5DZoKw/viewform";

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useLayoutEffect, useCallback } from "react";
-import { ExternalLink, Shield, Wifi, Globe, Clock } from "lucide-react";
-import { TOOLS, USE_CASES, type AccessLevel, type UseCase } from "@/lib/mock/tools";
+import { ExternalLink, Shield, Wifi, Globe, Clock, Send, Check, Monitor } from "lucide-react";
+import { TOOLS, USE_CASES, type AccessLevel, type UseCase, type Tool } from "@/lib/mock/tools";
+import StarToggle from "@/components/StarToggle";
 
 const accessBadge: Record<AccessLevel, { label: string; color: string; icon: typeof Shield }> = {
   NIPR:       { label: "Commonly approved for official use, verify locally", color: "bg-success-tint text-success-mid", icon: Shield },
@@ -67,6 +68,101 @@ function SegmentedFilter<T extends string>({
           {labels ? labels[opt] : opt}
         </button>
       ))}
+    </div>
+  );
+}
+
+function ToolCard({ tool, index }: { tool: Tool; index: number }) {
+  const badge = accessBadge[tool.accessLevel];
+  const BadgeIcon = badge.icon;
+  const [sent, setSent] = useState(false);
+
+  const live = !tool.inDevelopment && !!tool.url;
+  const niprOnly = !tool.accessibleMobile && tool.accessLevel === "NIPR";
+
+  // "Send to me" relay is stubbed for Inc 1 — wire to the serverless relay in Inc 2.
+  const handleSendToMe = () => {
+    console.log(`[stub] Send to me: ${tool.name}`);
+    setSent(true);
+    setTimeout(() => setSent(false), 2500);
+  };
+
+  return (
+    <div
+      className="animate-fade-up bg-white rounded-card shadow-resting border border-silver-mid/50 hover:shadow-hover hover:border-primary/25 p-5 transition-all duration-base ease-smooth"
+      style={{ animationDelay: `${Math.min(index * 50, 300)}ms` }}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          <span className="text-2xl leading-none mt-0.5">{tool.icon}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-0.5">
+              <h3 className="text-sm font-bold text-primary-dark">{tool.name}</h3>
+              {tool.badge && (
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary text-white uppercase tracking-wide">
+                  {tool.badge}
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-primary font-semibold">{tool.tagline}</p>
+          </div>
+        </div>
+        <StarToggle
+          item={{ type: "tool", id: tool.id, title: tool.name, url: tool.url }}
+          className="-mr-1.5 -mt-1"
+        />
+      </div>
+
+      <p className="text-xs text-gray-600 mt-2 leading-relaxed">{tool.description}</p>
+
+      {niprOnly && (
+        <p className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 mt-2">
+          <Monitor size={11} /> Desktop / NIPR access required.
+        </p>
+      )}
+
+      <div className="flex items-center gap-2 mt-3 flex-wrap">
+        <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-badge ${badge.color}`}>
+          <BadgeIcon size={10} />
+          {badge.label}
+        </span>
+        {tool.useCases.map((uc) => (
+          <span key={uc} className="text-[10px] font-medium px-2 py-1 rounded-badge bg-gray-100 text-gray-500">
+            {uc}
+          </span>
+        ))}
+      </div>
+
+      {/* Device-aware action */}
+      <div className="mt-4">
+        {!live ? (
+          <span className="w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">
+            <Clock size={15} /> Coming soon
+          </span>
+        ) : tool.accessibleMobile ? (
+          <a
+            href={tool.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold bg-primary text-white active:bg-primary-dark transition-colors"
+          >
+            <ExternalLink size={15} /> Open tool
+          </a>
+        ) : (
+          <button
+            onClick={handleSendToMe}
+            className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold transition-colors ${
+              sent ? "bg-success text-white" : "bg-white border border-primary/40 text-primary active:bg-primary/5"
+            }`}
+          >
+            {sent ? (
+              <><Check size={15} /> Coming soon — saved for Inc 2</>
+            ) : (
+              <><Send size={15} /> Send to me</>
+            )}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -160,67 +256,9 @@ export default function ToolsPage() {
 
       {/* Tool cards */}
       <div className={`px-4 flex flex-col gap-3 pb-4 filter-grid ${fading ? "fading" : ""}`}>
-        {filtered.map((tool, index) => {
-          const badge = accessBadge[tool.accessLevel];
-          const BadgeIcon = badge.icon;
-          return (
-            <div
-              key={tool.id}
-              className="animate-fade-up bg-white rounded-card shadow-resting border border-silver-mid/50 hover:shadow-hover hover:border-primary/25 p-5 transition-all duration-base ease-smooth"
-              style={{ animationDelay: `${Math.min(index * 50, 300)}ms` }}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <span className="text-2xl leading-none mt-0.5">{tool.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                      <h3 className="text-sm font-bold text-primary-dark">{tool.name}</h3>
-                      {tool.badge && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary text-white uppercase tracking-wide">
-                          {tool.badge}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-primary font-semibold">{tool.tagline}</p>
-                  </div>
-                </div>
-                {tool.inDevelopment || !tool.url ? (
-                  <span
-                    className="flex-shrink-0 p-2 rounded-inner bg-gray-100 text-gray-400 cursor-not-allowed"
-                    aria-label={`${tool.name} is in development`}
-                    title="In development"
-                  >
-                    <Clock size={15} />
-                  </span>
-                ) : (
-                  <a
-                    href={tool.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-shrink-0 p-2 rounded-inner bg-background text-primary hover:bg-primary hover:text-white transition-colors"
-                    aria-label={`Open ${tool.name}`}
-                  >
-                    <ExternalLink size={15} />
-                  </a>
-                )}
-              </div>
-
-              <p className="text-xs text-gray-600 mt-2 leading-relaxed">{tool.description}</p>
-
-              <div className="flex items-center gap-2 mt-3 flex-wrap">
-                <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-badge ${badge.color}`}>
-                  <BadgeIcon size={10} />
-                  {badge.label}
-                </span>
-                {tool.useCases.map((uc) => (
-                  <span key={uc} className="text-[10px] font-medium px-2 py-1 rounded-badge bg-gray-100 text-gray-500">
-                    {uc}
-                  </span>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+        {filtered.map((tool, index) => (
+          <ToolCard key={tool.id} tool={tool} index={index} />
+        ))}
 
         {filtered.length === 0 && (
           <div className="text-center py-10 text-gray-400">

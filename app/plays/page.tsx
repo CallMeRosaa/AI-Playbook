@@ -2,11 +2,14 @@
 
 import { useMemo, useState, useSyncExternalStore } from "react";
 import {
-  Copy, Check, Clock, ChevronDown, ChevronUp, ShieldAlert, CheckSquare, Wrench, Timer,
+  Copy, Check, Clock, ChevronDown, ChevronUp, ShieldAlert, CheckSquare, Wrench, Timer, Lightbulb, ExternalLink,
 } from "lucide-react";
 import { AFSC_TILES, orderPlays, renderStarter, TIME_BACK_OPTIONS, type Play } from "@/lib/plays";
 import { addMinutes } from "@/lib/timeBack";
+import { markPlayRun } from "@/lib/favorites";
+import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 import SurfaceRouting from "@/components/SurfaceRouting";
+import StarToggle from "@/components/StarToggle";
 
 // The selected AFSC is persisted in localStorage (the external store) and read via
 // useSyncExternalStore so static prerender (null) and the client agree on first paint.
@@ -48,39 +51,47 @@ function PlayCard({ play }: { play: Play }) {
 
   const handleTimeBack = (minutes: number) => {
     addMinutes(minutes);
+    markPlayRun(play.id);
     setLogged(true);
     setTimeout(() => setLogged(false), 2500);
   };
 
   return (
     <div className="bg-white rounded-card shadow-resting border border-silver-mid/50 hover:shadow-hover hover:border-primary/25 overflow-hidden transition-all duration-base ease-smooth">
-      {/* 1. Title + one-line task */}
-      <button
-        onClick={() => setExpanded((e) => !e)}
-        className="w-full text-left p-5"
-        aria-expanded={expanded}
-      >
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-              {play.afsc && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-badge bg-primary-tint text-primary">
-                  {play.afsc}
-                </span>
-              )}
-              <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-badge bg-gray-100 text-gray-500">
-                <Clock size={9} />
-                {play.timeBack}
+      {/* 1. Title + one-line task — content toggles expand; star + chevron are siblings */}
+      <div className="flex items-start gap-2 p-5">
+        <button
+          onClick={() => setExpanded((e) => !e)}
+          className="flex-1 min-w-0 text-left"
+          aria-expanded={expanded}
+        >
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            {play.afsc && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-badge bg-primary-tint text-primary">
+                {play.afsc}
               </span>
-            </div>
-            <h3 className="text-sm font-bold text-primary-dark leading-tight">{play.title}</h3>
-            <p className="text-xs text-gray-500 mt-0.5 leading-snug">{play.task}</p>
+            )}
+            <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-badge bg-gray-100 text-gray-500">
+              <Clock size={9} />
+              {play.timeBack}
+            </span>
           </div>
-          <div className="flex-shrink-0 mt-1 text-gray-400">
+          <h3 className="text-sm font-bold text-primary-dark leading-tight">{play.title}</h3>
+          <p className="text-xs text-gray-500 mt-0.5 leading-snug">{play.task}</p>
+        </button>
+
+        <div className="flex items-center gap-0.5 flex-shrink-0 -mr-1.5">
+          <StarToggle item={{ type: "play", id: play.id, title: play.title, url: "/plays" }} />
+          <button
+            onClick={() => setExpanded((e) => !e)}
+            aria-label={expanded ? "Collapse play" : "Expand play"}
+            aria-expanded={expanded}
+            className="p-1.5 text-gray-400 hover:text-primary transition-colors"
+          >
             {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </div>
+          </button>
         </div>
-      </button>
+      </div>
 
       {expanded && (
         <div className="px-5 pb-5 border-t border-silver-mid/40">
@@ -238,6 +249,38 @@ export default function PlaysPage() {
         {plays.map((play) => (
           <PlayCard key={play.id} play={play} />
         ))}
+
+        {/* Suggest a play — SME contribution door */}
+        {SUGGEST_PLAY_FORM_URL ? (
+          <a
+            href={SUGGEST_PLAY_FORM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 p-4 rounded-card bg-white border border-primary/30 shadow-resting active:bg-primary/5 transition-colors"
+          >
+            <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Lightbulb size={18} className="text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-primary-dark leading-tight">Suggest a play</p>
+              <p className="text-xs text-gray-500 leading-snug">Know a task AI could speed up? Propose it for the shelf.</p>
+            </div>
+            <ExternalLink size={16} className="flex-shrink-0 text-primary/60" />
+          </a>
+        ) : (
+          <div className="flex items-center gap-3 p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting">
+            <div className="w-9 h-9 rounded-inner bg-silver-tint flex items-center justify-center flex-shrink-0">
+              <Lightbulb size={18} className="text-silver" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-primary-dark leading-tight">Suggest a play</p>
+              <p className="text-xs text-gray-500 leading-snug">Contribution form opening soon.</p>
+            </div>
+            <span className="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-badge bg-gray-100 text-gray-500 flex-shrink-0">
+              Coming soon
+            </span>
+          </div>
+        )}
 
         <p className="text-[10px] text-gray-400 text-center leading-relaxed px-4 pt-1 pb-2">
           Plays are examples for a concept demonstration. Time figures are self-reported estimates. Verify every
