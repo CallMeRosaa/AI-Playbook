@@ -32,17 +32,17 @@ export const TOOLS: Tool[] = [
     icon: "🛡️",
     accessibleMobile: false,
   },
-  // TODO(user): confirm Ask Sage URL, access level, and mobile accessibility.
+  // TODO(user): confirm the exact CAC-gated Ask Sage URL for the Inc 2 relay.
   {
     id: "t15",
     name: "Ask Sage",
-    tagline: "Government-Focused Generative AI",
+    tagline: "Multi-Model AI in an IL5 Environment",
     description:
-      "A generative AI platform built for government and defense workflows, with access to multiple models in one place. Approved environments vary by unit — confirm your local guidance before official use.",
+      "A government-focused generative AI platform running in an IL5 environment with a wide range of AI models and the ability to build solid workflows. NIPR-only and CAC-gated. Usage is metered, so it costs money to run — but registering with your .mil address grants a monthly token allotment.",
     accessLevel: "NIPR",
     useCases: ["Writing", "Research", "Data"],
-    url: "",
-    badge: "Verify locally",
+    url: "https://chat.asksage.ai",
+    badge: "NIPR · CAC",
     icon: "🧭",
     accessibleMobile: false,
   },
