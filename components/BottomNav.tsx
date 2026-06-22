@@ -36,26 +36,26 @@ export default function BottomNav() {
               className={`
                 relative flex-1 flex flex-col items-center justify-center pt-2.5 pb-2 gap-1 text-xs font-semibold
                 transition-colors duration-150
-                ${active ? "text-primary" : "text-gray-500 hover:text-primary active:text-primary-dark"}
+                ${active ? "text-white" : "text-on-dark-dim hover:text-white active:text-white"}
               `}
             >
               {/* Top accent — the clear "you are here" marker */}
               <span className={`
-                absolute top-0 h-0.5 rounded-b-full bg-primary transition-all duration-250
+                absolute top-0 h-0.5 rounded-b-full bg-white transition-all duration-250
                 ${active ? "w-8 opacity-100" : "w-0 opacity-0"}
               `} />
               <span className={`
                 flex items-center justify-center w-11 h-7 rounded-full transition-all duration-200
                 ${active
-                  ? "bg-primary text-white shadow-resting"
-                  : "bg-silver-tint border border-silver-mid/40 hover:bg-silver-mid/40"}
+                  ? "bg-white text-primary shadow-resting"
+                  : "bg-transparent"}
               `}>
                 <Icon
                   size={21}
                   strokeWidth={active ? 2.6 : 2.1}
                 />
               </span>
-              <span className={`leading-none tracking-tight ${active ? "font-bold text-primary" : ""}`}>
+              <span className={`leading-none tracking-tight ${active ? "font-bold text-white" : ""}`}>
                 {label}
               </span>
             </Link>

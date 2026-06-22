@@ -99,7 +99,7 @@ function PlayCard({ play }: { play: Play }) {
           <p className="text-[10px] font-bold uppercase tracking-wider text-silver mt-3 mb-1.5">
             Starter prompt
           </p>
-          <div className="bg-background rounded-inner p-3">
+          <div className="bg-background rounded-inner p-3 border border-silver-mid/40">
             <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">{starter}</p>
           </div>
           <button
@@ -185,25 +185,23 @@ export default function PlaysPage() {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="hero-af text-white px-5 pt-5 pb-5">
+      <div className="hero-af text-white px-5 pt-5 pb-5 overflow-hidden rounded-b-[24px]">
         <div className="flex items-center gap-3 mb-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
           <div className="w-px h-5 bg-silver/40 flex-shrink-0" aria-hidden="true" />
           <span className="text-[10px] font-bold tracking-widest uppercase text-on-dark-dim">Airman&apos;s Playbook</span>
         </div>
-        <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">Play Shelf</h1>
+        <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">Playbook</h1>
         <p className="text-sm text-on-dark">
           Pick your job, copy the safe starting move, go run it on GenAI.mil.
         </p>
       </div>
 
-      <div className="h-px bg-silver-mid" />
-
       {/* AFSC tiles */}
       <div className="px-4 pt-4">
         <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">Pick your AFSC</p>
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 [mask-image:linear-gradient(to_right,black_85%,transparent)]">
           {AFSC_TILES.map((tile) => {
             const active = selectedAfsc === tile.code;
             return (

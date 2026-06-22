@@ -231,7 +231,7 @@ export default function ToolsPage() {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="hero-af text-white px-5 pt-5 pb-5">
+      <div className="hero-af text-white px-5 pt-5 pb-5 overflow-hidden rounded-b-[24px]">
         <div className="flex items-center gap-3 mb-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-6 flex-shrink-0" draggable={false} />
@@ -245,9 +245,6 @@ export default function ToolsPage() {
           Start at GenAI.mil for official, unclassified work. The rest is context.
         </p>
       </div>
-
-      {/* Silver accent bar */}
-      <div className="h-px bg-silver-mid" />
 
       {/* Category filter */}
       <div className="px-4 pt-4">

@@ -29,7 +29,7 @@ const paths = [
     href: "/ai-101",
     icon: GraduationCap,
     title: "I'm new to all this",
-    body: "Six quick reads on what AI is, what it's not, and how to stay safe. You can't break anything at IL2.",
+    body: "Six quick reads on what AI is, what it's not, and how to stay safe. You can't break anything here.",
     primary: false,
   },
 ];
@@ -86,7 +86,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col">
       {/* ── Hero / value-prop landing ── */}
-      <div className="relative hero-af text-white px-5 pt-8 pb-10 overflow-hidden">
+      <div className="relative hero-af text-white px-5 pt-8 pb-10 overflow-hidden rounded-b-[24px]">
         <div aria-hidden="true" className="pointer-events-none select-none">
           <div className="hero-blob-1 absolute -top-20 -right-20 w-72 h-72 rounded-full" />
           <div className="hero-blob-2 absolute top-8 -left-24 w-56 h-56 rounded-full" />
@@ -99,7 +99,7 @@ export default function HomePage() {
             <img src="/assets/af-symbol-white.svg" alt="U.S. Air Force" className="h-16 mx-auto" draggable={false} />
           </div>
 
-          <div className="w-12 h-px bg-silver mb-5" aria-hidden="true" />
+          <div className="w-12 h-px bg-warm mb-5" aria-hidden="true" />
 
           <h1 className="font-display text-4xl font-black uppercase tracking-wider leading-tight mb-2">
             Airman&apos;s<br />Playbook
@@ -123,8 +123,6 @@ export default function HomePage() {
           </button>
         </div>
       </div>
-
-      <div className="h-px bg-silver-mid" />
 
       {/* ── Front-door content — one rhythm for every section ── */}
       <div className="px-4 pt-5 pb-8 flex flex-col gap-7">
@@ -199,7 +197,7 @@ export default function HomePage() {
         {/* Built to be safe at IL2 — security reframed as a trust signal */}
         <section>
           <ScrollReveal>
-            <SectionLabel>Built to be safe at IL2</SectionLabel>
+            <SectionLabel>Built to be safe by design</SectionLabel>
           </ScrollReveal>
           <ScrollReveal>
             <div className="flex gap-3 p-4 rounded-card bg-warm/10 border border-warm/30">
