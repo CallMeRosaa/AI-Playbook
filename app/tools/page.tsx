@@ -2,7 +2,7 @@
 
 import { useState, useRef, useLayoutEffect, useCallback } from "react";
 import { ExternalLink, Shield, Wifi, Globe, Clock, Send, Check, Monitor } from "lucide-react";
-import { TOOLS, USE_CASES, type AccessLevel, type UseCase, type Tool } from "@/lib/mock/tools";
+import { TOOLS, USE_CASES, SECTIONS, type AccessLevel, type UseCase, type Section, type Tool } from "@/lib/mock/tools";
 import StarToggle from "@/components/StarToggle";
 
 const accessBadge: Record<AccessLevel, { label: string; color: string; icon: typeof Shield }> = {
@@ -18,8 +18,18 @@ const accessFilterLabel: Record<AccessLevel | "All", string> = {
   Both:       "Official + Personal",
 };
 
+const sectionFilterLabel: Record<Section | "All", string> = {
+  All:        "All",
+  ai:         "AI",
+  automation: "Automation",
+  data:       "Data",
+  digital:    "Digital",
+  soon:       "Coming Soon",
+};
+
 const ACCESS_OPTIONS = (["All", "NIPR", "Commercial", "Both"] as (AccessLevel | "All")[]);
 const USE_CASE_OPTIONS = (["All", ...USE_CASES] as (UseCase | "All")[]);
+const SECTION_OPTIONS = (["All", ...SECTIONS.map((s) => s.id)] as (Section | "All")[]);
 
 function SegmentedFilter<T extends string>({
   options,
@@ -168,36 +178,55 @@ function ToolCard({ tool, index }: { tool: Tool; index: number }) {
 }
 
 export default function ToolsPage() {
+  const [activeSection, setActiveSection] = useState<Section | "All">("All");
   const [activeAccess, setActiveAccess] = useState<AccessLevel | "All">("All");
   const [activeUseCase, setActiveUseCase] = useState<UseCase | "All">("All");
   const [fading, setFading] = useState(false);
+  const [displaySection, setDisplaySection] = useState<Section | "All">("All");
   const [displayAccess, setDisplayAccess] = useState<AccessLevel | "All">("All");
   const [displayUseCase, setDisplayUseCase] = useState<UseCase | "All">("All");
 
-  const applyFilter = useCallback((acc: AccessLevel | "All", uc: UseCase | "All") => {
+  const applyFilter = useCallback((sec: Section | "All", acc: AccessLevel | "All", uc: UseCase | "All") => {
     setFading(true);
     setTimeout(() => {
+      setDisplaySection(sec);
       setDisplayAccess(acc);
       setDisplayUseCase(uc);
       setFading(false);
     }, 130);
   }, []);
 
+  const handleSection = (s: Section | "All") => {
+    setActiveSection(s);
+    applyFilter(s, activeAccess, activeUseCase);
+  };
+
   const handleAccess = (a: AccessLevel | "All") => {
     setActiveAccess(a);
-    applyFilter(a, activeUseCase);
+    applyFilter(activeSection, a, activeUseCase);
   };
 
   const handleUseCase = (u: UseCase | "All") => {
     setActiveUseCase(u);
-    applyFilter(activeAccess, u);
+    applyFilter(activeSection, activeAccess, u);
   };
 
-  const filtered = TOOLS.filter((t) => {
+  const matchesFilters = (t: Tool) => {
+    const matchesSection = displaySection === "All" || t.section === displaySection;
     const matchesAccess = displayAccess === "All" || t.accessLevel === displayAccess;
     const matchesUseCase = displayUseCase === "All" || t.useCases.includes(displayUseCase);
-    return matchesAccess && matchesUseCase;
-  });
+    return matchesSection && matchesAccess && matchesUseCase;
+  };
+
+  const filtered = TOOLS.filter(matchesFilters);
+
+  // Group surviving tools by section, preserving SECTIONS order and dropping empties.
+  const groupedSections = SECTIONS
+    .map((s) => ({ ...s, tools: filtered.filter((t) => t.section === s.id) }))
+    .filter((s) => s.tools.length > 0);
+
+  // Running index across sections keeps the fade-up cascade smooth.
+  let cardIndex = 0;
 
   return (
     <div className="flex flex-col">
@@ -220,8 +249,23 @@ export default function ToolsPage() {
       {/* Silver accent bar */}
       <div className="h-px bg-silver-mid" />
 
-      {/* Access filter */}
+      {/* Category filter */}
       <div className="px-4 pt-4">
+        <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">Filter by category</p>
+        <div className="overflow-x-auto">
+          <SegmentedFilter
+            options={SECTION_OPTIONS}
+            labels={sectionFilterLabel}
+            active={activeSection}
+            onChange={handleSection}
+            pillColor="bg-primary"
+            activeTextColor="text-white"
+          />
+        </div>
+      </div>
+
+      {/* Access filter */}
+      <div className="px-4 pt-3">
         <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">Filter by access</p>
         <div className="overflow-x-auto">
           <SegmentedFilter
@@ -254,23 +298,37 @@ export default function ToolsPage() {
         <p className="text-xs text-gray-500 font-medium">{filtered.length} tool{filtered.length !== 1 ? "s" : ""}</p>
       </div>
 
-      {/* Tool cards */}
+      {/* Tool cards, grouped by section */}
       <div className={`px-4 flex flex-col gap-3 pb-4 filter-grid ${fading ? "fading" : ""}`}>
-        {filtered.map((tool, index) => (
-          <ToolCard key={tool.id} tool={tool} index={index} />
+        {groupedSections.map((section) => (
+          <div key={section.id} className="flex flex-col gap-3">
+            <div className="mt-2 first:mt-0">
+              <h2 className="text-xs font-bold text-primary-dark uppercase tracking-wider">{section.label}</h2>
+              <p className="text-[11px] text-gray-500 mt-0.5">{section.blurb}</p>
+            </div>
+            {section.tools.map((tool) => (
+              <ToolCard key={tool.id} tool={tool} index={cardIndex++} />
+            ))}
+          </div>
         ))}
 
         {filtered.length === 0 && (
           <div className="text-center py-10 text-gray-400">
             <p className="text-sm font-medium">No tools match your filters</p>
             <button
-              onClick={() => { handleAccess("All"); handleUseCase("All"); }}
+              onClick={() => { handleSection("All"); handleAccess("All"); handleUseCase("All"); }}
               className="text-xs text-primary font-semibold mt-2"
             >
               Clear filters
             </button>
           </div>
         )}
+
+        <div className="mt-1 p-3 rounded-inner bg-primary/5 border border-primary/20">
+          <p className="text-[10px] text-primary-dark leading-relaxed">
+            <span className="font-bold">Reclaim hours:</span> the M365 tools chain together — <span className="font-semibold">Form → List → Power Automate → Power App / Power BI dashboard</span> — to automate the admin work you do by hand today.
+          </p>
+        </div>
 
         <div className="mt-1 p-3 rounded-inner bg-warm/10 border border-warm/30">
           <p className="text-[10px] text-primary-dark leading-relaxed">
