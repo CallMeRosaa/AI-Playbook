@@ -144,17 +144,19 @@ body {
   padding-bottom: 5rem;
 }
 
-/* Frosted glass nav — silver border gives metallic separation */
+/* Frosted glass nav — silver border gives metallic separation.
+   Kept solid + elevated at rest so the tabs read clearly on bright screens. */
 .nav-glass {
-  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
-  backdrop-filter: blur(12px) saturate(1.5);
-  -webkit-backdrop-filter: blur(12px) saturate(1.5);
-  border-top: 1px solid color-mix(in srgb, var(--color-silver) 22%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  backdrop-filter: blur(14px) saturate(1.6);
+  -webkit-backdrop-filter: blur(14px) saturate(1.6);
+  border-top: 1px solid color-mix(in srgb, var(--color-silver) 45%, transparent);
+  box-shadow: 0 -3px 14px -6px color-mix(in srgb, var(--color-primary-dark) 14%, transparent);
   transition: box-shadow var(--duration-base) ease, background var(--duration-base) ease;
 }
 .nav-glass.scrolled {
-  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
-  box-shadow: 0 -4px 16px -4px color-mix(in srgb, var(--color-primary-dark) 12%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 98%, transparent);
+  box-shadow: 0 -5px 20px -5px color-mix(in srgb, var(--color-primary-dark) 18%, transparent);
 }
 
 /* Official AF hero gradient — navy-to-primary, use on all page headers */
