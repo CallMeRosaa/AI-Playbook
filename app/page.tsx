@@ -2,29 +2,54 @@
 
 import Link from "next/link";
 import {
-  Clock, ArrowRight, Layers, Compass, Bot,
-  CheckCircle2, XCircle, Lightbulb, ExternalLink,
+  Clock, ArrowRight, Layers, Wrench, GraduationCap,
+  Compass, Bot, CheckCircle2, ShieldCheck, Lightbulb, ExternalLink,
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { useTimeBack, formatTimeBack } from "@/lib/timeBack";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 
-// ─── How it works — the orientation guide, promoted out of the Guide modal ──────
-const steps = [
+// ─── Where do you want to start? — the multi-path router into the app ───────────
+const paths = [
   {
+    href: "/plays",
     icon: Layers,
-    title: "Pick your AFSC",
-    body: "On the Play Shelf, tap your job. The shelf reorders so your plays surface first, then the universal plays everyone uses.",
+    title: "I have a task to speed up",
+    body: "Plays for your AFSC and the everyday admin everyone does. Copy a vetted starter prompt and go.",
+    primary: true,
   },
   {
+    href: "/tools",
+    icon: Wrench,
+    title: "I need the right tool",
+    body: "Browse 18 vetted AI and automation tools — from GenAI.mil to Power Automate — with what's NIPR-approved.",
+    primary: false,
+  },
+  {
+    href: "/ai-101",
+    icon: GraduationCap,
+    title: "I'm new to all this",
+    body: "Six quick reads on what AI is, what it's not, and how to stay safe. You can't break anything at IL2.",
+    primary: false,
+  },
+];
+
+// ─── How it works — the universal loop, not just the play flow ──────────────────
+const steps = [
+  {
     icon: Compass,
-    title: "Read the play",
-    body: "Each play shows the task, a copyable starter prompt, the approved tool, what to never paste, and the verify step. It is a reference, not a generator.",
+    title: "Find your move",
+    body: "Pick a play for your job or a tool for the task.",
   },
   {
     icon: Bot,
-    title: "Go run it",
-    body: "Copy the starter prompt and run it on the right surface. GenAI.mil is the place to start for official, unclassified work.",
+    title: "Run it on the right surface",
+    body: "Copy the starter prompt and run it where it belongs. GenAI.mil is the place to start for official, unclassified work.",
+  },
+  {
+    icon: CheckCircle2,
+    title: "Verify before it's official",
+    body: "The app never generates or stores anything for you. You own and check every output.",
   },
 ];
 
@@ -76,27 +101,23 @@ export default function HomePage() {
 
           <div className="w-12 h-px bg-silver mb-5" aria-hidden="true" />
 
-          <h1 className="font-display text-4xl font-black uppercase tracking-wider leading-tight mb-4">
+          <h1 className="font-display text-4xl font-black uppercase tracking-wider leading-tight mb-2">
             Airman&apos;s<br />Playbook
           </h1>
 
-          <p className="text-base text-white font-semibold leading-snug max-w-[20rem]">
-            An app built for Airmen by Airmen to reclaim hours from routine work and refocus on what matters.
+          <p className="text-caption font-bold uppercase tracking-widest text-warm mb-4">
+            Built for Airmen, by Airmen
           </p>
 
-          {/* One clear action into the plays */}
-          <Link
-            href="/plays"
-            className="mt-7 inline-flex items-center gap-2 bg-warm text-primary-dark font-bold text-sm uppercase tracking-wider px-7 py-3.5 rounded-inner shadow-raised active:scale-[0.98] transition-all duration-base ease-smooth"
-          >
-            Find Your Play
-            <ArrowRight size={16} />
-          </Link>
+          <p className="text-base text-white font-semibold leading-snug max-w-[20rem]">
+            Your starting point for AI at work. Find the play for your job, the right tool for the task,
+            and the safe way to run it.
+          </p>
 
           {/* Pathway to the deeper Guide modal (the "?" trigger lives here now) */}
           <button
             onClick={openGuide}
-            className="mt-4 text-xs font-semibold text-on-dark underline underline-offset-4 decoration-on-dark/40 hover:text-white transition-colors"
+            className="mt-6 text-xs font-semibold text-on-dark underline underline-offset-4 decoration-on-dark/40 hover:text-white transition-colors"
           >
             What is this?
           </button>
@@ -110,7 +131,45 @@ export default function HomePage() {
         {/* Returning-user tally (only renders once something is logged) */}
         <TimeReclaimed />
 
-        {/* How it works */}
+        {/* Where do you want to start? — the multi-path router */}
+        <section>
+          <ScrollReveal>
+            <SectionLabel>Where do you want to start?</SectionLabel>
+          </ScrollReveal>
+          <div className="flex flex-col gap-3">
+            {paths.map(({ href, icon: Icon, title, body, primary }) => (
+              <ScrollReveal key={href}>
+                <Link
+                  href={href}
+                  className={`flex items-center gap-3 p-4 rounded-card shadow-resting active:scale-[0.99] transition-transform ${
+                    primary
+                      ? "bg-primary text-white"
+                      : "bg-white border border-silver-mid/40"
+                  }`}
+                >
+                  <div
+                    className={`w-9 h-9 rounded-inner flex items-center justify-center flex-shrink-0 ${
+                      primary ? "bg-white/20" : "bg-primary/10"
+                    }`}
+                  >
+                    <Icon size={18} className={primary ? "text-warm" : "text-primary"} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-sm font-bold leading-tight ${primary ? "text-white" : "text-primary-dark"}`}>
+                      {title}
+                    </p>
+                    <p className={`text-xs leading-snug mt-0.5 ${primary ? "text-on-dark" : "text-gray-500"}`}>
+                      {body}
+                    </p>
+                  </div>
+                  <ArrowRight size={16} className={`flex-shrink-0 ${primary ? "text-white/70" : "text-silver"}`} />
+                </Link>
+              </ScrollReveal>
+            ))}
+          </div>
+        </section>
+
+        {/* How it works — the universal loop */}
         <section>
           <ScrollReveal>
             <SectionLabel>How it works</SectionLabel>
@@ -137,37 +196,22 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* What this app does / does not do */}
+        {/* Built to be safe at IL2 — security reframed as a trust signal */}
         <section>
           <ScrollReveal>
-            <SectionLabel>What this is</SectionLabel>
+            <SectionLabel>Built to be safe at IL2</SectionLabel>
           </ScrollReveal>
-          <div className="flex flex-col gap-3">
-            <ScrollReveal>
-              <div className="p-4 rounded-card bg-success-tint/60 border border-success/30">
-                <p className="flex items-center gap-2 text-xs font-bold text-success-mid uppercase tracking-wide mb-2">
-                  <CheckCircle2 size={14} /> What this app does
-                </p>
-                <ul className="text-xs text-gray-700 leading-relaxed list-disc pl-4 space-y-1">
-                  <li>Tells you what AI can do for your specific job.</li>
-                  <li>Gives you the safe starting move as a copyable prompt.</li>
-                  <li>Routes you to the right surface to actually run it.</li>
-                </ul>
+          <ScrollReveal>
+            <div className="flex gap-3 p-4 rounded-card bg-warm/10 border border-warm/30">
+              <div className="w-9 h-9 rounded-inner bg-warm/20 flex items-center justify-center flex-shrink-0">
+                <ShieldCheck size={18} className="text-caution" />
               </div>
-            </ScrollReveal>
-            <ScrollReveal>
-              <div className="p-4 rounded-card bg-danger-tint/50 border border-danger/30">
-                <p className="flex items-center gap-2 text-xs font-bold text-danger-mid uppercase tracking-wide mb-2">
-                  <XCircle size={14} /> What it does not do
-                </p>
-                <ul className="text-xs text-gray-700 leading-relaxed list-disc pl-4 space-y-1">
-                  <li>It does not run a model or generate answers for you.</li>
-                  <li>It does not run an interview or hold sensitive data.</li>
-                  <li>It is not the system of record. Always verify outputs.</li>
-                </ul>
-              </div>
-            </ScrollReveal>
-          </div>
+              <p className="text-xs text-primary-dark leading-relaxed">
+                Nothing you type is sent, stored, or generated here. The app points you to approved tools and
+                reminds you never to paste classified, CUI, or PII — and to verify every output before official use.
+              </p>
+            </div>
+          </ScrollReveal>
         </section>
 
         {/* Suggest a play — SME contribution door */}
@@ -208,16 +252,6 @@ export default function HomePage() {
             )}
           </ScrollReveal>
         </section>
-
-        {/* OPSEC line — always-visible at the front door */}
-        <ScrollReveal>
-          <div className="p-4 rounded-card bg-warm/10 border border-warm/30">
-            <p className="text-xs text-primary-dark leading-relaxed">
-              <span className="font-bold">Stay clean at IL2.</span> Never enter classified, CUI, or PII into any AI
-              tool. Use generic, unclassified examples, and verify every output before official use.
-            </p>
-          </div>
-        </ScrollReveal>
       </div>
     </div>
   );

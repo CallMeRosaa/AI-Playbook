@@ -2,27 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import {
-  Layers, Bot, BookOpen, FileText, CheckCircle2, XCircle, Compass, X, Lightbulb, ExternalLink,
+  Bot, BookOpen, FileText, Compass, X, Lightbulb, ExternalLink,
 } from "lucide-react";
 import { SURFACES, SUGGEST_PLAY_FORM_URL } from "@/lib/links";
-
-const steps = [
-  {
-    icon: Layers,
-    title: "Pick your AFSC",
-    body: "On the Play Shelf, tap your job. The shelf reorders so your plays surface first, then the universal plays everyone uses.",
-  },
-  {
-    icon: Compass,
-    title: "Read the play",
-    body: "Each play shows the task, a copyable starter prompt, the approved tool, what to never paste, and the verify step. It is a reference, not a generator.",
-  },
-  {
-    icon: Bot,
-    title: "Go run it",
-    body: "Copy the starter prompt and run it on the right surface. GenAI.mil is the place to start for official, unclassified work.",
-  },
-];
 
 const surfaces = [
   { icon: FileText, label: "The signed PDF", role: "Doctrine. The authoritative reference.", status: SURFACES.pdf.status },
@@ -99,52 +81,12 @@ export default function GuideModal({ open, onClose }: { open: boolean; onClose: 
         </div>
 
         <div className="px-4 pt-5 flex flex-col gap-5 pb-7">
-          {/* Three steps */}
-          <div>
-            <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">The flow</p>
-            <div className="flex flex-col gap-3">
-              {steps.map(({ icon: Icon, title, body }, i) => (
-                <div key={title} className="flex gap-3 p-4 rounded-card bg-white border border-silver-mid/40 shadow-resting">
-                  <div className="flex-shrink-0">
-                    <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center relative">
-                      <Icon size={18} className="text-primary" />
-                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center">
-                        {i + 1}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="text-sm font-bold text-primary-dark">{title}</h3>
-                    <p className="text-xs text-gray-500 mt-0.5 leading-snug">{body}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* What it is / is not */}
-          <div className="grid grid-cols-1 gap-3">
-            <div className="p-4 rounded-card bg-success-tint/60 border border-success/30">
-              <p className="flex items-center gap-2 text-xs font-bold text-success-mid uppercase tracking-wide mb-2">
-                <CheckCircle2 size={14} /> What this app does
-              </p>
-              <ul className="text-xs text-gray-700 leading-relaxed list-disc pl-4 space-y-1">
-                <li>Tells you what AI can do for your specific job.</li>
-                <li>Gives you the safe starting move as a copyable prompt.</li>
-                <li>Routes you to the right surface to actually run it.</li>
-              </ul>
-            </div>
-            <div className="p-4 rounded-card bg-danger-tint/50 border border-danger/30">
-              <p className="flex items-center gap-2 text-xs font-bold text-danger-mid uppercase tracking-wide mb-2">
-                <XCircle size={14} /> What it does not do
-              </p>
-              <ul className="text-xs text-gray-700 leading-relaxed list-disc pl-4 space-y-1">
-                <li>It does not run a model or generate answers for you.</li>
-                <li>It does not run an interview or hold sensitive data.</li>
-                <li>It is not the system of record. Always verify outputs.</li>
-              </ul>
-            </div>
-          </div>
+          {/* What this app is, in one line — the home page carries the full flow */}
+          <p className="text-sm text-gray-600 leading-relaxed">
+            This app is the <span className="font-semibold text-primary-dark">discovery layer</span> of the Playbook —
+            it finds the right play or tool for your task and points you to where to run it. It never runs a model,
+            holds your data, or replaces the system of record. It is one of four surfaces that work together.
+          </p>
 
           {/* Four surfaces */}
           <div>
