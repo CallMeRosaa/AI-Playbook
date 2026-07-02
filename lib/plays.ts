@@ -10,7 +10,7 @@
 // content was authored from the existing prompt library because the referenced
 // AFSC-PLAYS-CONTENT.md was not present in the repo — see NEXT.md.
 
-export type PlayGroup = "afsc" | "taxer" | "everyday";
+export type PlayGroup = "afsc" | "taxer" | "team" | "everyday";
 
 export interface PlayVar {
   key: string;   // matches {{key}} in promptTemplate
@@ -196,6 +196,23 @@ export const PLAYS: Play[] = [
     timeBack: "Est. about 30 min back",
   },
   {
+    id: "taxer-extraduty",
+    title: "Additional Duty Kickstart",
+    task: "Turn a newly assigned extra duty into a 30-day plan you can execute.",
+    group: "taxer",
+    promptTemplate:
+      "I was just assigned an additional duty on top of my primary job. Build me a 30-day kickstart plan. Structure: what this duty typically requires and who typically inspects or checks it, a week-by-week plan for the first 30 days, a running checklist of recurring tasks with suggested frequency, the five questions I should ask the outgoing member or my leadership, and the two or three things people most commonly get wrong in this duty. Keep it practical and unclassified.\n\nThe additional duty: {{duty}}\nWhat I already know or was handed: {{context}}",
+    vars: [
+      { key: "duty", label: "the additional duty" },
+      { key: "context", label: "what you were handed" },
+    ],
+    approvedTool: GENAIMIL_FIRST,
+    neverPaste:
+      "Never paste unit-specific inspection results, member names, or program data. Describe the duty generically.",
+    verify: "Check the plan against your unit's actual program requirements and your predecessor's continuity binder.",
+    timeBack: "Est. about 2 hrs back",
+  },
+  {
     id: "taxer-bluf",
     title: "BLUF Email Summary",
     task: "Compress a long email chain into a crisp BLUF.",
@@ -224,6 +241,105 @@ export const PLAYS: Play[] = [
     neverPaste: NEVER_PASTE_DEFAULT,
     verify: "Sanity-check the time blocks and owners against reality before you send the invite.",
     timeBack: "Est. about 15 min back",
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Team Execution plays — alignment, decisions, and follow-through
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "team-ambiguous",
+    title: "Turn Ambiguous Guidance into an Action Plan",
+    task: "Move out on unclear guidance without waiting for perfect clarity.",
+    group: "team",
+    promptTemplate:
+      "Help me turn ambiguous guidance into a practical action plan. Build it with: commander's intent as understood, key assumptions, the decision needed now, actions we can take without additional permission, questions that require clarification, risks and mitigations, a recommended next 24 to 72 hour move, and a short update I can send to leadership.\n\nMission or task: {{task}}\nGuidance received (summarized): {{guidance}}\nKnown facts and unknowns: {{facts}}\nConstraints: {{constraints}}\nRisk if we wait vs. risk if we move: {{risk}}",
+    vars: [
+      { key: "task", label: "the mission or task" },
+      { key: "guidance", label: "guidance received" },
+      { key: "facts", label: "knowns and unknowns" },
+      { key: "constraints", label: "constraints" },
+      { key: "risk", label: "risk of waiting vs. moving" },
+    ],
+    approvedTool: GENAIMIL_FIRST,
+    neverPaste:
+      "Never paste operational details, unit identifiers, timelines tied to real missions, or the actual guidance verbatim if it is sensitive. Summarize generically.",
+    verify: "Confirm the intent and assumptions with your leadership before anyone executes. The plan is a draft, not an order.",
+    timeBack: "Est. about 1 hr back",
+  },
+  {
+    id: "team-commitments",
+    title: "Convert a Meeting into Commitments",
+    task: "Turn meeting notes into owners, deadlines, and follow-through.",
+    group: "team",
+    promptTemplate:
+      "Turn these meeting notes into a clear commitment tracker. Produce: key decisions made, open issues, action items with owner, due date, and deliverable, dependencies, risks to follow-through, a suggested follow-up message, and a recommended agenda for the next check-in.\n\nObjective of the meeting: {{objective}}\nMeeting notes (sanitized): {{notes}}\nBattle rhythm or deadline, if known: {{rhythm}}",
+    vars: [
+      { key: "objective", label: "meeting objective" },
+      { key: "notes", label: "the sanitized notes" },
+      { key: "rhythm", label: "deadline or battle rhythm" },
+    ],
+    approvedTool: GENAIMIL_FIRST,
+    neverPaste:
+      "Strip names and contact info; use roles or offices as owners. Never paste sensitive program detail from the notes.",
+    verify: "Confirm each owner actually agreed to the action before the tracker goes out under your name.",
+    timeBack: "Est. about 30 min back",
+  },
+  {
+    id: "team-conversation",
+    title: "Prep a High-Stakes Conversation",
+    task: "Plan a difficult professional conversation: clear, calm, mission-focused.",
+    group: "team",
+    promptTemplate:
+      "I need to prepare for a high-stakes professional conversation. Help me build a concise conversation plan that is direct, respectful, and mission-focused. Build it with: the purpose in one sentence, facts I should state (separating observed facts from assumptions), open-ended questions I should ask, the message I need to deliver in direct but professional language, likely reactions and how to handle each, the decision or commitment to ask for before it ends, and a short follow-up note I can send afterward. Keep it candid, calm, and aligned to mission and standards, not emotional.\n\nThe situation (generic, no names): {{situation}}\nThe other party's role: {{role}}\nDesired outcome: {{outcome}}\nConstraints and what makes it difficult: {{concern}}",
+    vars: [
+      { key: "situation", label: "the situation, generically" },
+      { key: "role", label: "their role" },
+      { key: "outcome", label: "desired outcome" },
+      { key: "concern", label: "constraints and concerns" },
+    ],
+    approvedTool: GENAIMIL_FIRST,
+    neverPaste:
+      "Never paste names, ranks with identifying context, personnel actions, medical or family details, or anything from a protected process. Describe people only by generic role.",
+    verify: "The plan preps you; the conversation is yours. If it touches discipline, EO, or IG territory, talk to the right office first.",
+    timeBack: "Est. about 45 min back",
+  },
+  {
+    id: "team-disagreement",
+    title: "Turn Team Disagreement into Decision Options",
+    task: "Depersonalize a stuck debate into courses of action.",
+    group: "team",
+    promptTemplate:
+      "Help me turn a team disagreement into clear decision options. Build it with: a neutral problem statement, what each side is optimizing for, valid concerns on each side, hidden assumptions to test, decision criteria, possible courses of action, a recommended path forward, and one paragraph I can use to reset the team conversation.\n\nThe issue: {{issue}}\nPosition A (summarized fairly): {{positionA}}\nPosition B and other views: {{positionB}}\nMission impact and constraints: {{impact}}\nWho decides, if known: {{owner}}",
+    vars: [
+      { key: "issue", label: "the issue" },
+      { key: "positionA", label: "position a" },
+      { key: "positionB", label: "position b and others" },
+      { key: "impact", label: "impact and constraints" },
+      { key: "owner", label: "decision owner" },
+    ],
+    approvedTool: GENAIMIL_FIRST,
+    neverPaste:
+      "Summarize positions without names. Never paste sensitive program data or anything said in confidence.",
+    verify: "Pressure-test the recommended course with the actual decision owner before presenting it as the way forward.",
+    timeBack: "Est. about 45 min back",
+  },
+  {
+    id: "team-charter",
+    title: "Build a Team Charter for a Short-Fuse Effort",
+    task: "Get a tiger team or working group aligned on one page, fast.",
+    group: "team",
+    promptTemplate:
+      "Help me build a one-page team charter for a short-fuse effort. Create it with: purpose, problem statement, desired outcome, roles and responsibilities, decision rights, operating rhythm, communication norms, measures of success, top risks, and the first three actions.\n\nThe effort and deadline: {{effort}}\nMission or problem: {{problem}}\nTeam roles and stakeholders (roles, not names): {{team}}\nConstraints and desired end product: {{constraints}}",
+    vars: [
+      { key: "effort", label: "effort and deadline" },
+      { key: "problem", label: "the problem" },
+      { key: "team", label: "roles and stakeholders" },
+      { key: "constraints", label: "constraints and product" },
+    ],
+    approvedTool: GENAIMIL_FIRST,
+    neverPaste: NEVER_PASTE_DEFAULT,
+    verify: "Walk the charter with the team and the decision owner; it only counts once they agree to it.",
+    timeBack: "Est. about 1 hr back",
   },
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -308,8 +424,9 @@ export function orderPlays(selectedAfsc: string | null): Play[] {
   const rank = (p: Play): number => {
     if (selectedAfsc && p.group === "afsc" && p.afsc === selectedAfsc) return 0;
     if (p.group === "taxer") return 1;
-    if (p.group === "everyday") return 2;
-    return 3; // other AFSCs' plays sink to the bottom
+    if (p.group === "team") return 2;
+    if (p.group === "everyday") return 3;
+    return 4; // other AFSCs' plays sink to the bottom
   };
   return [...PLAYS].sort((a, b) => rank(a) - rank(b));
 }

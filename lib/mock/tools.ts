@@ -1,6 +1,14 @@
-export type AccessLevel = "NIPR" | "Commercial" | "Both";
+// ── Approved tools roster ───────────────────────────────────────────────────
+// EXECUTIVE DECISION (1 Jul 2026): commercial tools are out. Everything listed
+// here is approved for official use (verify locally). This removes the
+// approved-vs-commercial ambiguity entirely: if it is on this page, it is an
+// approved tool. Personal-use commercial tools are deliberately not listed.
+//
+// Plain-language rule: no Impact Level or compliance jargon (IL2/IL4/IL5,
+// FedRAMP, CAC-gated) in any Airman-facing string. Say what it means instead.
+
 export type UseCase =
-  | "Writing" | "Research" | "Images" | "Code" | "Transcription" | "Briefings" | "Data" | "Video"
+  | "Writing" | "Research" | "Images" | "Briefings" | "Data"
   | "Automation" | "Dashboards" | "Apps" | "Forms";
 export type Section = "ai" | "automation" | "data" | "digital" | "soon";
 
@@ -10,7 +18,6 @@ export interface Tool {
   tagline: string;
   description: string;
   section: Section;
-  accessLevel: AccessLevel;
   useCases: UseCase[];
   url: string;
   badge?: string;
@@ -18,131 +25,59 @@ export interface Tool {
   inDevelopment?: boolean;
   // Can an Airman reach this directly from a personal phone browser?
   //   true  → render a direct "Open tool" link on any device.
-  //   false → desktop / NIPR only → openable in workstation mode; otherwise offer
+  //   false → workstation only → openable in workstation mode; otherwise offer
   //           "Save to your dashboard" so the Airman can run it later at a workstation.
   accessibleMobile: boolean;
 }
 
 // Ordered — drives section render order and headers on the Tools page.
 export const SECTIONS: { id: Section; label: string; blurb: string }[] = [
-  { id: "ai",         label: "AI",                blurb: "Frontier AI to draft, research, and decide faster." },
-  { id: "automation", label: "Automation",        blurb: "Stop doing it by hand — let workflows run the busywork." },
+  { id: "ai",         label: "Approved AI",       blurb: "Frontier AI, approved for official unclassified work." },
+  { id: "automation", label: "Automation",        blurb: "Stop doing it by hand. Let workflows run the busywork." },
   { id: "data",       label: "Data & Databases",  blurb: "Turn trackers and spreadsheets into living data." },
-  { id: "digital",    label: "Digital Workspace", blurb: "Collect, store, and share — without the paper." },
-  { id: "soon",       label: "Coming Soon",       blurb: "Announced — verify availability in your tenant." },
+  { id: "digital",    label: "Digital Workspace", blurb: "Collect, store, and share, without the paper." },
+  { id: "soon",       label: "Coming Soon",       blurb: "Announced and on the way. Verify availability locally." },
 ];
 
 export const TOOLS: Tool[] = [
-  // ── AI · official (NIPR / CAC) ──────────────────────────────────────────
+  // ── Approved AI ──────────────────────────────────────────────────────────
   {
     id: "t1",
     name: "GenAI.mil",
     tagline: "DoD Enterprise AI Platform (CDAO)",
     description:
-      "The Department of War's enterprise generative AI platform, run by the CDAO and adopted across the DAF, giving roughly 3 million personnel frontier AI for unclassified (CUI) work in a FedRAMP High / IL5 environment. Choose from multiple models — Google Gemini for Government (launch model), xAI's Grok, and OpenAI's ChatGPT — to draft and summarize documents, generate images with Gemini's Nano Banana, run enterprise search, and build no-code AI agents with Agent Builder, then export your work to PDF, DOCX, Markdown, or JSON. Your data stays in the government environment and is never used to train vendors' public models. The easiest on-ramp — start here for official, unclassified work.",
+      "The Department's enterprise generative AI platform, run by the CDAO and adopted across the DAF, giving roughly 3 million personnel frontier AI for official unclassified work in a secure government environment. Choose from multiple frontier models to draft and summarize documents, generate images, run enterprise search, and build no-code AI agents, then export your work to PDF, DOCX, Markdown, or JSON. Your data stays in the government environment and is never used to train public models. The easiest on-ramp. Start here for official, unclassified work.",
     section: "ai",
-    accessLevel: "NIPR",
     useCases: ["Writing", "Research", "Images", "Briefings", "Data"],
     url: "https://genai.mil",
-    badge: "DAF Official",
+    badge: "Start Here",
     icon: "🛡️",
     accessibleMobile: false,
   },
-  // TODO(user): confirm the exact CAC-gated Ask Sage URL.
+  // TODO(user): confirm the exact Ask Sage URL from a government workstation.
   {
     id: "t15",
     name: "Ask Sage",
-    tagline: "Multi-Model AI in an IL5 Environment",
+    tagline: "Multi-Model AI for Government Work",
     description:
-      "A government-focused generative AI platform running in an IL5 environment with 150+ AI models and a robust no-code Agent Builder for multi-step workflows. More powerful and technical than GenAI.mil, but usage is metered — token allotments vary by org, so check your access — and onboarding has more barriers. NIPR-only and CAC-gated.",
+      "A government-focused generative AI platform approved for official unclassified work, with 150+ AI models and a robust no-code Agent Builder for multi-step workflows. More powerful and technical than GenAI.mil, but usage is metered and onboarding has more steps, so check your unit's access first. Government workstation only.",
     section: "ai",
-    accessLevel: "NIPR",
     useCases: ["Writing", "Research", "Data"],
     url: "https://chat.asksage.ai",
-    badge: "NIPR · CAC",
+    badge: "Advanced",
     icon: "🧭",
     accessibleMobile: false,
   },
-  // TODO(user): confirm OpenAFI access level (outbound link card).
-  {
-    id: "t16",
-    name: "OpenAFI",
-    tagline: "AI Help for Air Force Instructions",
-    description:
-      "An outbound resource for navigating and understanding Air Force Instructions with AI assistance. Always verify against the current certified publication on AF e-Publishing before citing in official work.",
-    section: "ai",
-    accessLevel: "Both",
-    useCases: ["Research"],
-    url: "https://openafi.com/chat",
-    badge: "Outbound",
-    icon: "📖",
-    accessibleMobile: true,
-  },
 
-  // ── AI · personal (Commercial — personal devices only) ──────────────────
-  {
-    id: "t5",
-    name: "ChatGPT",
-    tagline: "General-Purpose AI Assistant",
-    description:
-      "OpenAI's widely known AI chat tool and a strong all-rounder — writing, coding, brainstorming, and Q&A. A great place to start building everyday AI habits. Personal use only; never enter CUI, PII, or classified information.",
-    section: "ai",
-    accessLevel: "Commercial",
-    useCases: ["Writing", "Research", "Code"],
-    url: "https://chatgpt.com",
-    icon: "💬",
-    accessibleMobile: true,
-  },
-  {
-    id: "t18",
-    name: "Gemini",
-    tagline: "Google's Multimodal AI",
-    description:
-      "Google's multimodal assistant — text, image generation, and research grounded in Google Search. Tight integration with Google's tools makes it handy for everyday tasks. Personal use only; never enter CUI, PII, or classified information.",
-    section: "ai",
-    accessLevel: "Commercial",
-    useCases: ["Writing", "Research", "Images"],
-    url: "https://gemini.google.com",
-    icon: "✨",
-    accessibleMobile: true,
-  },
-  {
-    id: "t19",
-    name: "Grok",
-    tagline: "Real-Time AI from xAI",
-    description:
-      "xAI's assistant with real-time web and X knowledge, image generation (Grok Imagine), and coding help. Good for current-events questions and quick creative work. Personal use only; never enter CUI, PII, or classified information.",
-    section: "ai",
-    accessLevel: "Commercial",
-    useCases: ["Writing", "Research", "Images"],
-    url: "https://grok.com",
-    icon: "🤖",
-    accessibleMobile: true,
-  },
-  {
-    id: "t20",
-    name: "NotebookLM",
-    tagline: "Source-Grounded Research Assistant",
-    description:
-      "Upload your own sources and get answers grounded only in them, with inline citations — plus Audio and Video Overviews, mind maps, and study aids. Excellent for digesting long documents and learning. Personal use only; never upload CUI, PII, or classified information.",
-    section: "ai",
-    accessLevel: "Commercial",
-    useCases: ["Research", "Briefings"],
-    url: "https://notebooklm.google.com",
-    icon: "📓",
-    accessibleMobile: true,
-  },
-
-  // ── Automation (M365 Power Platform · NIPR) ─────────────────────────────
+  // ── Automation (M365 Power Platform) ─────────────────────────────────────
   // TODO(user): confirm DoD365 maker URLs for your tenant.
   {
     id: "t22",
     name: "Power Automate",
     tagline: "Automate the busywork",
     description:
-      "Build no-code \"flows\" that route approvals (leave, awards, travel), move files, and send reminders automatically — kill the manual chasing and status-tracking. Copilot can draft a flow from a plain-English description. (Premium connectors and Dataverse flows need extra licensing.)",
+      "Build no-code flows that route approvals (leave, awards, travel), move files, and send reminders automatically. Kill the manual chasing and status-tracking. Copilot can draft a flow from a plain-English description. (Premium connectors and Dataverse flows need extra licensing.)",
     section: "automation",
-    accessLevel: "NIPR",
     useCases: ["Automation"],
     url: "https://make.gov.powerautomate.us",
     badge: "M365",
@@ -154,9 +89,8 @@ export const TOOLS: Tool[] = [
     name: "Power Apps",
     tagline: "Build apps without code",
     description:
-      "Turn a spreadsheet or SharePoint List into a real phone/desktop app with forms and logic — replace a paper in-processing checklist or an Excel equipment tracker. Copilot can generate a starter app from a description. (Dataverse/premium-connector apps need extra licensing.)",
+      "Turn a spreadsheet or SharePoint List into a real phone/desktop app with forms and logic. Replace a paper in-processing checklist or an Excel equipment tracker. Copilot can generate a starter app from a description. (Dataverse/premium-connector apps need extra licensing.)",
     section: "automation",
-    accessLevel: "NIPR",
     useCases: ["Apps", "Automation"],
     url: "https://make.gov.powerapps.us",
     badge: "M365",
@@ -164,19 +98,20 @@ export const TOOLS: Tool[] = [
     accessibleMobile: false,
   },
 
-  // ── Data & Databases (NIPR) ─────────────────────────────────────────────
-  // TODO(user): confirm the Envision login URL.
+  // ── Data & Databases ─────────────────────────────────────────────────────
+  // TODO(user): verify the Envision URL from a CAC-enabled workstation before
+  // publishing. It cannot be verified from a commercial network, so the card is
+  // kept link-less (Coming soon) until confirmed.
   {
     id: "t14",
     name: "Envision",
     tagline: "Enterprise DAF Data & AI Platform",
     description:
-      "An enterprise DAF-level platform powered by Palantir (Foundry / AIP), open to anyone with a CAC just by logging in. Unlike chat tools, Envision is an integration platform: it connects DAF data sources so you can build your own AI apps and chatbots grounded on that data. Example: an HR-publications bot — an AI model wired to all e-pubs and regs — that answers straight from the source. The most powerful platform here for data-driven AI.",
+      "The DAF's enterprise data platform, open to Airmen just by logging in from a government workstation. Unlike chat tools, Envision is an integration platform: it connects DAF data sources so you can build apps, analysis, and AI grounded on that data. Example: a publications assistant wired to e-pubs and regs that answers straight from the source. The most powerful platform here for data-driven work.",
     section: "data",
-    accessLevel: "NIPR",
     useCases: ["Data", "Research"],
     url: "",
-    badge: "Palantir AIP",
+    badge: "DAF Enterprise",
     icon: "🔭",
     accessibleMobile: false,
   },
@@ -185,9 +120,8 @@ export const TOOLS: Tool[] = [
     name: "Power BI",
     tagline: "Live dashboards from data",
     description:
-      "Point it at a tracker and get an auto-refreshing, interactive leadership dashboard instead of rebuilding weekly slides by hand. (Power BI is available on NIPR; Copilot-in-Power-BI at DoD is not yet confirmed — verify locally.)",
+      "Point it at a tracker and get an auto-refreshing, interactive leadership dashboard instead of rebuilding weekly slides by hand. (Copilot inside Power BI is not confirmed everywhere; verify locally.)",
     section: "data",
-    accessLevel: "NIPR",
     useCases: ["Dashboards", "Data"],
     url: "https://app.powerbigov.us",
     badge: "M365",
@@ -199,9 +133,8 @@ export const TOOLS: Tool[] = [
     name: "Microsoft Lists / SharePoint Lists",
     tagline: "Smart trackers, shared",
     description:
-      "One structured, shared tracker for tasks, assets, and statuses — with views, rules, and reminders — instead of an emailed Excel file. (Lists and SharePoint lists are the same underlying data.) It's the free data layer that Power Apps, Power Automate, and Power BI build on.",
+      "One structured, shared tracker for tasks, assets, and statuses, with views, rules, and reminders, instead of an emailed Excel file. (Lists and SharePoint lists are the same underlying data.) It's the free data layer that Power Apps, Power Automate, and Power BI build on.",
     section: "data",
-    accessLevel: "NIPR",
     useCases: ["Data"],
     url: "https://www.microsoft365.us",
     badge: "M365",
@@ -213,9 +146,8 @@ export const TOOLS: Tool[] = [
     name: "Dataverse",
     tagline: "Power Platform's real database",
     description:
-      "The secure relational database behind advanced Power Platform apps — for complex related data, roles, and business rules well beyond what a List handles. Advanced: it's premium-licensed (not free like Lists), so confirm your entitlement before building on it.",
+      "The secure relational database behind advanced Power Platform apps, for complex related data, roles, and business rules well beyond what a List handles. Advanced: it's premium-licensed (not free like Lists), so confirm your entitlement before building on it.",
     section: "data",
-    accessLevel: "NIPR",
     useCases: ["Data"],
     url: "https://make.gov.powerapps.us",
     badge: "Advanced",
@@ -223,16 +155,15 @@ export const TOOLS: Tool[] = [
     accessibleMobile: false,
   },
 
-  // ── Digital Workspace (NIPR) ────────────────────────────────────────────
+  // ── Digital Workspace ────────────────────────────────────────────────────
   // TODO(user): SharePoint/Forms URLs are tenant-specific — confirm for your unit.
   {
     id: "t27",
     name: "SharePoint",
     tagline: "Your team's home base",
     description:
-      "Team sites and versioned document libraries — one source of truth for SOPs, docs, and trackers instead of scattered shared drives. It's the backbone behind Teams, Lists, Power Apps, and Power Automate.",
+      "Team sites and versioned document libraries. One source of truth for SOPs, docs, and trackers instead of scattered shared drives. It's the backbone behind Teams, Lists, Power Apps, and Power Automate.",
     section: "digital",
-    accessLevel: "NIPR",
     useCases: ["Data"],
     url: "https://www.microsoft365.us",
     badge: "M365",
@@ -244,9 +175,8 @@ export const TOOLS: Tool[] = [
     name: "Microsoft Forms",
     tagline: "Surveys and intake forms",
     description:
-      "Stand up a survey or intake form in minutes; responses land in Excel/Lists automatically and can trigger a Power Automate flow to route and log them — goodbye paper. (Gov clouds disable a few extras like email notifications and external sharing.)",
+      "Stand up a survey or intake form in minutes; responses land in Excel/Lists automatically and can trigger a Power Automate flow to route and log them. Goodbye paper. (Gov clouds disable a few extras like email notifications and external sharing.)",
     section: "digital",
-    accessLevel: "NIPR",
     useCases: ["Forms", "Data"],
     url: "https://forms.office.com",
     badge: "M365",
@@ -254,19 +184,22 @@ export const TOOLS: Tool[] = [
     accessibleMobile: false,
   },
 
-  // ── Coming Soon ─────────────────────────────────────────────────────────
+  // ── Coming Soon ──────────────────────────────────────────────────────────
+  // AAA is the enterprise AI schoolhouse arriving on GenAI.mil. The Playbook is
+  // the front door and routing layer; AAA is where an Airman goes to actually
+  // learn in depth. This card is the baton pass. No live URL yet: honesty over
+  // dead links. Flip to live and move into "ai" the day it ships.
   {
     id: "t21",
-    name: "NotebookLM on GenAI.mil",
-    tagline: "Source-Grounded Research, on NIPR",
+    name: "AI for All Airmen (AAA)",
+    tagline: "Your personal AI tutor, on GenAI.mil",
     description:
-      "Reportedly arriving in the GenAI.mil enterprise suite via CDAO — a NIPR, source-grounded research tool that answers from your provided sources with citations. Listed here pending official confirmation; verify availability locally.",
+      "An Air Force AI schoolhouse arriving on GenAI.mil. It interviews you about your job and experience, then builds a personalized learning roadmap grounded only in Air Force approved sources, with study aids like quizzes, audio overviews, and mind maps. When you're ready to go past a single play and actually build AI fluency, this is the destination. Enterprise release expected this summer; verify availability locally.",
     section: "soon",
-    accessLevel: "NIPR",
     useCases: ["Research", "Briefings"],
     url: "",
     badge: "Coming Soon",
-    icon: "📓",
+    icon: "🎓",
     inDevelopment: true,
     accessibleMobile: false,
   },
@@ -275,9 +208,8 @@ export const TOOLS: Tool[] = [
     name: "Copilot Studio",
     tagline: "Build your own chatbot",
     description:
-      "A no-code builder for custom AI agents that answer from your unit's docs and policies and take action via flows — for example, a help-desk bot for routine member questions. Available in GCC High today; DoD (IL5) availability isn't confirmed yet — verify in your tenant.",
+      "A no-code builder for custom AI agents that answer from your unit's docs and policies and take action via flows. For example, a help-desk bot for routine member questions. Availability varies by environment; verify in your tenant.",
     section: "soon",
-    accessLevel: "NIPR",
     useCases: ["Automation", "Apps"],
     url: "",
     badge: "Coming Soon",
@@ -287,5 +219,4 @@ export const TOOLS: Tool[] = [
   },
 ];
 
-export const USE_CASES: UseCase[] = ["Writing", "Research", "Images", "Code", "Transcription", "Briefings", "Data", "Video", "Automation", "Dashboards", "Apps", "Forms"];
-export const ACCESS_LEVELS: AccessLevel[] = ["NIPR", "Commercial", "Both"];
+export const USE_CASES: UseCase[] = ["Writing", "Research", "Images", "Briefings", "Data", "Automation", "Dashboards", "Apps", "Forms"];

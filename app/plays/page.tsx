@@ -240,8 +240,8 @@ export default function PlaysPage() {
       <div className="px-4 pt-3 pb-1">
         <p className="text-xs text-gray-500 font-medium">
           {selectedAfsc
-            ? `${selectedAfsc} plays first, then the universal and everyday plays.`
-            : "Universal plays everyone uses, then everyday writing tasks. Pick a tile to surface your job's plays."}
+            ? `${selectedAfsc} plays first, then universal, team execution, and everyday plays.`
+            : "Universal plays everyone uses, then team execution and everyday writing tasks. Pick a tile to surface your job's plays."}
         </p>
       </div>
 

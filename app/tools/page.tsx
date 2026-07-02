@@ -1,24 +1,17 @@
 "use client";
 
 import { useState, useRef, useLayoutEffect, useCallback } from "react";
-import { ExternalLink, Shield, Wifi, Globe, Clock, Check, Monitor, Star } from "lucide-react";
-import { TOOLS, USE_CASES, SECTIONS, type AccessLevel, type UseCase, type Section, type Tool } from "@/lib/mock/tools";
+import { ExternalLink, Shield, Clock, Check, Monitor, Star } from "lucide-react";
+import { TOOLS, USE_CASES, SECTIONS, type UseCase, type Section, type Tool } from "@/lib/mock/tools";
 import StarToggle from "@/components/StarToggle";
 import ContextModeToggle from "@/components/ContextModeToggle";
 import { useMode } from "@/lib/mode";
 import { useIsStarred, toggleStar, type StarredItem } from "@/lib/favorites";
 
-const accessBadge: Record<AccessLevel, { label: string; color: string; icon: typeof Shield }> = {
-  NIPR:       { label: "Commonly approved for official use, verify locally", color: "bg-success-tint text-success-mid", icon: Shield },
-  Commercial: { label: "Personal use only, unclassified",                    color: "bg-caution-tint text-caution-mid", icon: Globe  },
-  Both:       { label: "Official and personal use",                          color: "bg-primary-tint text-primary",      icon: Wifi   },
-};
-
-const accessFilterLabel: Record<AccessLevel | "All", string> = {
-  All:        "All",
-  NIPR:       "Official (NIPR)",
-  Commercial: "Personal Use Only",
-  Both:       "Official + Personal",
+// Every tool on this page is approved for official use. One badge, one meaning.
+const APPROVED_BADGE = {
+  label: "Approved for official use, verify locally",
+  color: "bg-success-tint text-success-mid",
 };
 
 const sectionFilterLabel: Record<Section | "All", string> = {
@@ -30,7 +23,6 @@ const sectionFilterLabel: Record<Section | "All", string> = {
   soon:       "Coming Soon",
 };
 
-const ACCESS_OPTIONS = (["All", "NIPR", "Commercial", "Both"] as (AccessLevel | "All")[]);
 const USE_CASE_OPTIONS = (["All", ...USE_CASES] as (UseCase | "All")[]);
 const SECTION_OPTIONS = (["All", ...SECTIONS.map((s) => s.id)] as (Section | "All")[]);
 
@@ -108,12 +100,10 @@ function SaveToDashboard({ item }: { item: StarredItem }) {
 }
 
 function ToolCard({ tool, index }: { tool: Tool; index: number }) {
-  const badge = accessBadge[tool.accessLevel];
-  const BadgeIcon = badge.icon;
   const mode = useMode();
 
   const live = !tool.inDevelopment && !!tool.url;
-  const niprOnly = !tool.accessibleMobile && tool.accessLevel === "NIPR";
+  const workstationOnly = !tool.accessibleMobile;
   // Openable here when the tool works on any device, or when the Airman says they are
   // at a workstation (ADR-R08). Otherwise offer "Save to your dashboard" so they can
   // run it later at a workstation.
@@ -147,16 +137,16 @@ function ToolCard({ tool, index }: { tool: Tool; index: number }) {
 
       <p className="text-xs text-gray-600 mt-2 leading-relaxed">{tool.description}</p>
 
-      {niprOnly && !canOpen && (
+      {workstationOnly && !canOpen && (
         <p className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 mt-2">
-          <Monitor size={11} /> Desktop / NIPR access required.
+          <Monitor size={11} /> Open this one from your government workstation.
         </p>
       )}
 
       <div className="flex items-center gap-2 mt-3 flex-wrap">
-        <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-badge ${badge.color}`}>
-          <BadgeIcon size={10} />
-          {badge.label}
+        <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-badge ${APPROVED_BADGE.color}`}>
+          <Shield size={10} />
+          {APPROVED_BADGE.label}
         </span>
         {tool.useCases.map((uc) => (
           <span key={uc} className="text-[10px] font-medium px-2 py-1 rounded-badge bg-gray-100 text-gray-500">
@@ -190,18 +180,15 @@ function ToolCard({ tool, index }: { tool: Tool; index: number }) {
 
 export default function ToolsPage() {
   const [activeSection, setActiveSection] = useState<Section | "All">("All");
-  const [activeAccess, setActiveAccess] = useState<AccessLevel | "All">("All");
   const [activeUseCase, setActiveUseCase] = useState<UseCase | "All">("All");
   const [fading, setFading] = useState(false);
   const [displaySection, setDisplaySection] = useState<Section | "All">("All");
-  const [displayAccess, setDisplayAccess] = useState<AccessLevel | "All">("All");
   const [displayUseCase, setDisplayUseCase] = useState<UseCase | "All">("All");
 
-  const applyFilter = useCallback((sec: Section | "All", acc: AccessLevel | "All", uc: UseCase | "All") => {
+  const applyFilter = useCallback((sec: Section | "All", uc: UseCase | "All") => {
     setFading(true);
     setTimeout(() => {
       setDisplaySection(sec);
-      setDisplayAccess(acc);
       setDisplayUseCase(uc);
       setFading(false);
     }, 130);
@@ -209,24 +196,18 @@ export default function ToolsPage() {
 
   const handleSection = (s: Section | "All") => {
     setActiveSection(s);
-    applyFilter(s, activeAccess, activeUseCase);
-  };
-
-  const handleAccess = (a: AccessLevel | "All") => {
-    setActiveAccess(a);
-    applyFilter(activeSection, a, activeUseCase);
+    applyFilter(s, activeUseCase);
   };
 
   const handleUseCase = (u: UseCase | "All") => {
     setActiveUseCase(u);
-    applyFilter(activeSection, activeAccess, u);
+    applyFilter(activeSection, u);
   };
 
   const matchesFilters = (t: Tool) => {
     const matchesSection = displaySection === "All" || t.section === displaySection;
-    const matchesAccess = displayAccess === "All" || t.accessLevel === displayAccess;
     const matchesUseCase = displayUseCase === "All" || t.useCases.includes(displayUseCase);
-    return matchesSection && matchesAccess && matchesUseCase;
+    return matchesSection && matchesUseCase;
   };
 
   const filtered = TOOLS.filter(matchesFilters);
@@ -253,7 +234,7 @@ export default function ToolsPage() {
           AI Tools
         </h1>
         <p className="text-sm text-on-dark">
-          Start at GenAI.mil for official, unclassified work. The rest is context.
+          Every tool on this page is approved for official use. Start at GenAI.mil for official, unclassified work.
         </p>
       </div>
 
@@ -272,21 +253,6 @@ export default function ToolsPage() {
             active={activeSection}
             onChange={handleSection}
             pillColor="bg-primary"
-            activeTextColor="text-white"
-          />
-        </div>
-      </div>
-
-      {/* Access filter */}
-      <div className="px-4 pt-3">
-        <p className="text-[10px] font-bold text-silver uppercase tracking-wider mb-2">Filter by access</p>
-        <div className="overflow-x-auto">
-          <SegmentedFilter
-            options={ACCESS_OPTIONS}
-            labels={accessFilterLabel}
-            active={activeAccess}
-            onChange={handleAccess}
-            pillColor="bg-primary-dark"
             activeTextColor="text-white"
           />
         </div>
@@ -329,7 +295,7 @@ export default function ToolsPage() {
           <div className="text-center py-10 text-gray-400">
             <p className="text-sm font-medium">No tools match your filters</p>
             <button
-              onClick={() => { handleSection("All"); handleAccess("All"); handleUseCase("All"); }}
+              onClick={() => { handleSection("All"); handleUseCase("All"); }}
               className="text-xs text-primary font-semibold mt-2"
             >
               Clear filters
@@ -345,7 +311,7 @@ export default function ToolsPage() {
 
         <div className="mt-1 p-3 rounded-inner bg-warm/10 border border-warm/30">
           <p className="text-[10px] text-primary-dark leading-relaxed">
-            <span className="font-bold">OPSEC reminder:</span> Never enter classified, CUI, or PII into commercial AI tools. Use NIPR-approved platforms for all sensitive work.
+            <span className="font-bold">OPSEC reminder:</span> Approved does not mean anything goes. Never enter classified information, and follow your local guidance on CUI and PII, even in approved tools.
           </p>
         </div>
       </div>

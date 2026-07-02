@@ -23,7 +23,7 @@ const paths = [
     href: "/tools",
     icon: Wrench,
     title: "I need the right tool",
-    body: "Browse 18 vetted AI and automation tools — from GenAI.mil to Power Automate — with what's NIPR-approved.",
+    body: "Browse the approved AI, automation, and data tools, from GenAI.mil to Power Automate. If it's listed, it's approved for official use.",
     primary: false,
   },
   {

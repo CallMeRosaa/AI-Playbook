@@ -1,6 +1,6 @@
 "use client";
 
-import { Brain, BrainCircuit, Coins, Layers, Database, MessageSquare, Bot } from "lucide-react";
+import { Brain, BrainCircuit, Coins, Layers, Database, MessageSquare, Bot, GraduationCap } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 
 export default function AI101Page() {
@@ -16,7 +16,7 @@ export default function AI101Page() {
         </div>
         <h1 className="font-display text-2xl font-bold uppercase tracking-wider mb-1">AI 101</h1>
         <p className="text-sm text-on-dark leading-relaxed">
-          Start at the top and work down — each idea builds on the one before it. By the end you&apos;ll know enough to go run your first play. You can&apos;t break anything at IL2.
+          Start at the top and work down — each idea builds on the one before it. By the end you&apos;ll know enough to go run your first play. You can&apos;t break anything here.
         </p>
       </div>
 
@@ -227,6 +227,26 @@ export default function AI101Page() {
                 allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
+            </div>
+          </div>
+        </ScrollReveal>
+
+        {/* 8. Go deeper — the baton pass to AAA (the enterprise AI schoolhouse) */}
+        <ScrollReveal>
+          <div className="p-4 rounded-card bg-primary/5 border border-primary/25 shadow-resting">
+            <div className="flex gap-3">
+              <div className="flex-shrink-0">
+                <div className="w-9 h-9 rounded-inner bg-primary/10 flex items-center justify-center">
+                  <GraduationCap size={18} className="text-primary" />
+                </div>
+              </div>
+              <div className="min-w-0">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-silver">Go deeper</span>
+                <h2 className="text-sm font-bold text-primary-dark">AI for All Airmen (AAA)</h2>
+                <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
+                  This page got you oriented. When you&apos;re ready for real depth, AAA is the Air Force&apos;s AI schoolhouse arriving on GenAI.mil: a personal tutor that learns your job and builds a learning roadmap from Air Force approved sources. The Playbook gets you in the door; AAA takes you the rest of the way. Coming soon, so verify availability locally.
+                </p>
+              </div>
             </div>
           </div>
         </ScrollReveal>
