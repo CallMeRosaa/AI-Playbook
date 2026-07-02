@@ -17,8 +17,9 @@ export interface Tool {
   icon: string;
   inDevelopment?: boolean;
   // Can an Airman reach this directly from a personal phone browser?
-  //   true  → render a direct link button.
-  //   false → desktop / NIPR only → render a "Send to me" button (Inc 2 relay stub).
+  //   true  → render a direct "Open tool" link on any device.
+  //   false → desktop / NIPR only → openable in workstation mode; otherwise offer
+  //           "Save to your dashboard" so the Airman can run it later at a workstation.
   accessibleMobile: boolean;
 }
 
@@ -47,7 +48,7 @@ export const TOOLS: Tool[] = [
     icon: "🛡️",
     accessibleMobile: false,
   },
-  // TODO(user): confirm the exact CAC-gated Ask Sage URL for the Inc 2 relay.
+  // TODO(user): confirm the exact CAC-gated Ask Sage URL.
   {
     id: "t15",
     name: "Ask Sage",
@@ -90,19 +91,6 @@ export const TOOLS: Tool[] = [
     useCases: ["Writing", "Research", "Code"],
     url: "https://chatgpt.com",
     icon: "💬",
-    accessibleMobile: true,
-  },
-  {
-    id: "t17",
-    name: "Claude",
-    tagline: "AI for Writing, Analysis & Building",
-    description:
-      "Anthropic's AI assistant — strong at writing, analysis, and coding. Use Artifacts and Claude's design features to build documents, visuals, and small interactive apps right in the chat. Excellent for learning more advanced AI workflows. Personal use only; never enter CUI, PII, or classified information.",
-    section: "ai",
-    accessLevel: "Commercial",
-    useCases: ["Writing", "Research", "Code"],
-    url: "https://claude.ai",
-    icon: "✳️",
     accessibleMobile: true,
   },
   {

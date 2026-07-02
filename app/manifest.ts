@@ -24,3 +24,7 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
   };
 }
+
+// The manifest returns a constant, so force it to a static asset at build time —
+// required for the metadata route to be emitted under `output: "export"`.
+export const dynamic = "force-static";

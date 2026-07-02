@@ -6,6 +6,7 @@ import {
   Compass, Bot, CheckCircle2, ShieldCheck, Lightbulb, ExternalLink,
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
+import ContextModeToggle from "@/components/ContextModeToggle";
 import { useTimeBack, formatTimeBack } from "@/lib/timeBack";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 
@@ -128,6 +129,11 @@ export default function HomePage() {
       <div className="px-4 pt-5 pb-8 flex flex-col gap-7">
         {/* Returning-user tally (only renders once something is logged) */}
         <TimeReclaimed />
+
+        {/* Context question — sets workstation vs. mobile mode (ADR-R08) */}
+        <ScrollReveal>
+          <ContextModeToggle />
+        </ScrollReveal>
 
         {/* Where do you want to start? — the multi-path router */}
         <section>

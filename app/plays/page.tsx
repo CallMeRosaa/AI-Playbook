@@ -3,10 +3,12 @@
 import { useMemo, useState, useSyncExternalStore } from "react";
 import {
   Copy, Check, Clock, ChevronDown, ChevronUp, ShieldAlert, CheckSquare, Wrench, Timer, Lightbulb, ExternalLink,
+  Monitor, Smartphone,
 } from "lucide-react";
 import { AFSC_TILES, orderPlays, renderStarter, TIME_BACK_OPTIONS, type Play } from "@/lib/plays";
 import { addMinutes } from "@/lib/timeBack";
 import { markPlayRun } from "@/lib/favorites";
+import { useMode } from "@/lib/mode";
 import { SUGGEST_PLAY_FORM_URL } from "@/lib/links";
 import SurfaceRouting from "@/components/SurfaceRouting";
 import StarToggle from "@/components/StarToggle";
@@ -175,6 +177,7 @@ function PlayCard({ play }: { play: Play }) {
 
 export default function PlaysPage() {
   const selectedAfsc = useSyncExternalStore(subscribeAfsc, readAfsc, () => null);
+  const mode = useMode();
 
   const selectAfsc = (code: string) => {
     writeAfsc(selectedAfsc === code ? null : code);
@@ -241,6 +244,19 @@ export default function PlaysPage() {
             : "Universal plays everyone uses, then everyday writing tasks. Pick a tile to surface your job's plays."}
         </p>
       </div>
+
+      {/* Mode-aware guidance — ADR-R08: execute now vs. save to run later */}
+      {mode && (
+        <div className="px-4 pt-2">
+          <p className="flex items-center gap-1.5 text-[11px] font-semibold text-primary-dark">
+            {mode === "workstation" ? (
+              <><Monitor size={12} className="text-primary flex-shrink-0" /> At a workstation — copy a play and run it on GenAI.mil now.</>
+            ) : (
+              <><Smartphone size={12} className="text-primary flex-shrink-0" /> On your phone — browse and star plays to run later at a workstation.</>
+            )}
+          </p>
+        </div>
+      )}
 
       {/* Play cards */}
       <div className="px-4 flex flex-col gap-3 pb-4">

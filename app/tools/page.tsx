@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useRef, useLayoutEffect, useCallback } from "react";
-import { ExternalLink, Shield, Wifi, Globe, Clock, Send, Check, Monitor } from "lucide-react";
+import { ExternalLink, Shield, Wifi, Globe, Clock, Check, Monitor, Star } from "lucide-react";
 import { TOOLS, USE_CASES, SECTIONS, type AccessLevel, type UseCase, type Section, type Tool } from "@/lib/mock/tools";
 import StarToggle from "@/components/StarToggle";
+import ContextModeToggle from "@/components/ContextModeToggle";
+import { useMode } from "@/lib/mode";
+import { useIsStarred, toggleStar, type StarredItem } from "@/lib/favorites";
 
 const accessBadge: Record<AccessLevel, { label: string; color: string; icon: typeof Shield }> = {
   NIPR:       { label: "Commonly approved for official use, verify locally", color: "bg-success-tint text-success-mid", icon: Shield },
@@ -82,20 +85,39 @@ function SegmentedFilter<T extends string>({
   );
 }
 
+// Save-to-dashboard action for desktop/NIPR-only tools the Airman can't open here.
+// Reuses the favorites store, so it stays in sync with the card's star (ADR-R07 —
+// replaces the retired "Send to me" relay with an in-app save; honesty over dead links).
+function SaveToDashboard({ item }: { item: StarredItem }) {
+  const saved = useIsStarred(item.id);
+  return (
+    <button
+      onClick={() => toggleStar(item)}
+      aria-pressed={saved}
+      className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold transition-colors ${
+        saved ? "bg-success text-white" : "bg-white border border-primary/40 text-primary active:bg-primary/5"
+      }`}
+    >
+      {saved ? (
+        <><Check size={15} /> Saved to your dashboard</>
+      ) : (
+        <><Star size={15} /> Save to your dashboard</>
+      )}
+    </button>
+  );
+}
+
 function ToolCard({ tool, index }: { tool: Tool; index: number }) {
   const badge = accessBadge[tool.accessLevel];
   const BadgeIcon = badge.icon;
-  const [sent, setSent] = useState(false);
+  const mode = useMode();
 
   const live = !tool.inDevelopment && !!tool.url;
   const niprOnly = !tool.accessibleMobile && tool.accessLevel === "NIPR";
-
-  // "Send to me" relay is stubbed for Inc 1 — wire to the serverless relay in Inc 2.
-  const handleSendToMe = () => {
-    console.log(`[stub] Send to me: ${tool.name}`);
-    setSent(true);
-    setTimeout(() => setSent(false), 2500);
-  };
+  // Openable here when the tool works on any device, or when the Airman says they are
+  // at a workstation (ADR-R08). Otherwise offer "Save to your dashboard" so they can
+  // run it later at a workstation.
+  const canOpen = live && (tool.accessibleMobile || mode === "workstation");
 
   return (
     <div
@@ -125,7 +147,7 @@ function ToolCard({ tool, index }: { tool: Tool; index: number }) {
 
       <p className="text-xs text-gray-600 mt-2 leading-relaxed">{tool.description}</p>
 
-      {niprOnly && (
+      {niprOnly && !canOpen && (
         <p className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 mt-2">
           <Monitor size={11} /> Desktop / NIPR access required.
         </p>
@@ -143,13 +165,13 @@ function ToolCard({ tool, index }: { tool: Tool; index: number }) {
         ))}
       </div>
 
-      {/* Device-aware action */}
+      {/* Device-aware action — ADR-R08 mode drives open vs. save */}
       <div className="mt-4">
         {!live ? (
           <span className="w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">
             <Clock size={15} /> Coming soon
           </span>
-        ) : tool.accessibleMobile ? (
+        ) : canOpen ? (
           <a
             href={tool.url}
             target="_blank"
@@ -159,18 +181,7 @@ function ToolCard({ tool, index }: { tool: Tool; index: number }) {
             <ExternalLink size={15} /> Open tool
           </a>
         ) : (
-          <button
-            onClick={handleSendToMe}
-            className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-inner text-sm font-semibold transition-colors ${
-              sent ? "bg-success text-white" : "bg-white border border-primary/40 text-primary active:bg-primary/5"
-            }`}
-          >
-            {sent ? (
-              <><Check size={15} /> Coming soon — saved for Inc 2</>
-            ) : (
-              <><Send size={15} /> Send to me</>
-            )}
-          </button>
+          <SaveToDashboard item={{ type: "tool", id: tool.id, title: tool.name, url: tool.url }} />
         )}
       </div>
     </div>
@@ -244,6 +255,11 @@ export default function ToolsPage() {
         <p className="text-sm text-on-dark">
           Start at GenAI.mil for official, unclassified work. The rest is context.
         </p>
+      </div>
+
+      {/* Context mode — decides whether cards lead with "Open tool" or "Save" */}
+      <div className="px-4 pt-4">
+        <ContextModeToggle />
       </div>
 
       {/* Category filter */}
